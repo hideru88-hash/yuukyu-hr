@@ -25,7 +25,11 @@
         "reject": "Rejeitar",
         "approve": "Aprovar",
         "approvedSuccess": "Solicitação aprovada!",
-        "rejectedSuccess": "Solicitação rejeitada."
+        "rejectedSuccess": "Solicitação rejeitada.",
+        "highPriority": "Alta Prioridade",
+        "medicalCertAttached": "Atestado Anexado",
+        "noPendingRequests": "Nenhuma solicitação pendente",
+        "rejectReasonPrompt": "Motivo da rejeição (opcional):"
     },
     "dashboard": {
         "goodMorning": "Bom dia",

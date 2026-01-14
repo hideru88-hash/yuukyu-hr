@@ -24,7 +24,11 @@
         "reject": "Reject",
         "approve": "Approve",
         "approvedSuccess": "Request approved!",
-        "rejectedSuccess": "Request rejected."
+        "rejectedSuccess": "Request rejected.",
+        "highPriority": "High Priority",
+        "medicalCertAttached": "Medical Cert. Attached",
+        "noPendingRequests": "No pending requests",
+        "rejectReasonPrompt": "Reason for rejection (optional):"
     },
     "dashboard": {
         "goodMorning": "Good Morning",
