@@ -12,7 +12,8 @@
         "hasAccount": "Já tem uma conta? Entre",
         "orLoginWith": "Ou entre com",
         "loading": "Carregando...",
-        "checkEmail": "Por favor, verifique seu e-mail para o link de confirmação!"
+        "checkEmail": "Por favor, verifique seu e-mail para o link de confirmação!",
+        "emailExists": "Este e-mail já está cadastrado. Por favor, tente entrar com sua senha."
     },
     "hr": {
         "panel": "Painel do RH",

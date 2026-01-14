@@ -43,7 +43,13 @@ const Login: React.FC = () => {
             if (result.error) throw result.error;
 
             if (isSignUp && !result.data.session) {
-                alert(t('login.checkEmail'));
+                // Supabase doesn't return a session if email confirmation is required OR if user already exists
+                // We check if it's an existing user by looking at the user object metadata or just providing a more helpful message
+                if (result.data.user?.identities?.length === 0) {
+                    setError(t('login.emailExists') || 'This email is already registered. Please try logging in.');
+                } else {
+                    alert(t('login.checkEmail'));
+                }
             } else {
                 navigate('/dashboard');
             }
