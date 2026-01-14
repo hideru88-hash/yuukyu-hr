@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTranslation, Trans } from 'react-i18next';
 
 const Dashboard: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
@@ -66,7 +66,7 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <header className="flex items-center justify-between pb-2">
         <div className="flex flex-col">
-          <p className="text-sm font-medium text-gray-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+          <p className="text-sm font-medium text-gray-500">{new Date().toLocaleDateString(i18n.language, { weekday: 'long', month: 'short', day: 'numeric' })}</p>
           <h1 className="text-2xl font-bold text-[#131616] tracking-tight">{t('dashboard.goodMorning')}, {fullName}</h1>
         </div>
         <button className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white border border-gray-100 shadow-sm transition-transform active:scale-95">
@@ -133,7 +133,7 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-col gap-1">
             <h3 className="font-bold text-[#131616]">{t('dashboard.expiringSoon')}</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
-              <Trans i18nKey="dashboard.expiringMessage" values={{ count: 3, date: 'March 31st' }}>
+              <Trans i18nKey="dashboard.expiringMessage" values={{ count: 3, date: new Date(new Date().getFullYear(), 2, 31).toLocaleDateString(i18n.language, { month: 'long', day: 'numeric' }) }}>
                 You have <span className="font-bold text-accent-warning">3 days</span> that will expire on March 31st. Plan ahead!
               </Trans>
             </p>
@@ -166,7 +166,7 @@ const Dashboard: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl font-bold leading-none ${req.status === 'approved' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-600'
                     }`}>
-                    <span className="text-xs uppercase font-semibold opacity-70">{new Date(req.start_date).toLocaleDateString('en-US', { month: 'short' })}</span>
+                    <span className="text-xs uppercase font-semibold opacity-70">{new Date(req.start_date).toLocaleDateString(i18n.language, { month: 'short' })}</span>
                     <span className="text-lg">{new Date(req.start_date).getDate()}</span>
                   </div>
                   <div>

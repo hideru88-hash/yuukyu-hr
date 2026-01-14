@@ -23,7 +23,7 @@ interface LeaveRequestWithProfile {
 }
 
 const HRDashboard: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { user } = useAuth();
     const [requests, setRequests] = useState<LeaveRequestWithProfile[]>([]);
@@ -99,8 +99,8 @@ const HRDashboard: React.FC = () => {
         const e = new Date(end);
         // Format: Oct 12 - Oct 20
         const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
-        const sStr = s.toLocaleDateString('en-US', options); // Todo: use i18n locale
-        const eStr = e.toLocaleDateString('en-US', options);
+        const sStr = s.toLocaleDateString(i18n.language, options);
+        const eStr = e.toLocaleDateString(i18n.language, options);
 
         if (start.split('T')[0] === end.split('T')[0]) {
             return `${sStr}`; // Same day
