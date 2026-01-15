@@ -49,6 +49,7 @@
         "openFullCalendar": "Abrir Calendário Completo",
         "loading": "Carregando solicitações...",
         "noPendingRequests": "Nenhuma solicitação pendente",
+        "searchEmployeesPlaceholder": "Nome ou departamento...",
         "rejectReasonPrompt": "Motivo da rejeição (opcional):",
         "urgent": "URGENTE",
         "businessDays": "{{count}} dias úteis"

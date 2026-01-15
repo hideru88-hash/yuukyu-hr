@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import RequestLeave from './pages/RequestLeave';
 import Calendar from './pages/Calendar';
 import HRDashboard from './pages/HRDashboard';
+import HREmployees from './pages/HREmployees';
 import HRSettings from './pages/HRSettings';
 import Reports from './pages/Reports';
 import Profile from './pages/Profile';
@@ -88,6 +89,7 @@ const AppRoutes: React.FC = () => {
             <ManagerLayout>
               <Routes>
                 <Route index element={<HRDashboard />} />
+                <Route path="team" element={<HREmployees />} />
                 <Route path="settings" element={<HRSettings />} />
                 <Route path="*" element={<Navigate to="/hr" replace />} />
               </Routes>

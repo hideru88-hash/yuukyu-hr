@@ -48,6 +48,7 @@
         "openFullCalendar": "Open Full Calendar",
         "loading": "Loading requests...",
         "noPendingRequests": "No pending requests",
+        "searchEmployeesPlaceholder": "Name or department...",
         "rejectReasonPrompt": "Reason for rejection (optional):",
         "urgent": "URGENT",
         "businessDays": "{{count}} business days"
