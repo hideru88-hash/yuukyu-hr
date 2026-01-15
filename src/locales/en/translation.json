@@ -130,7 +130,8 @@
             "approved": "Approved",
             "rejected": "Rejected"
         },
-        "rejectionReason": "Rejection Reason"
+        "rejectionReason": "Rejection Reason",
+        "overlapError": "You already have a leave request for this period."
     },
     "common": {
         "days": "Days",

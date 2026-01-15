@@ -133,14 +133,44 @@ const RequestLeave: React.FC = () => {
         setLoading(true);
 
         try {
+            // Construct full ISO strings for consistency in comparison
+            const startDateFull = formData.startDate + (isHourly ? ` ${formData.startTime}` : '');
+            const endDateFull = (isHourly ? formData.startDate : formData.endDate) + (isHourly ? ` ${formData.endTime}` : '');
+
+            const checkOverlap = async () => {
+                let query = supabase
+                    .from('leave_requests')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .neq('status', 'rejected') // Ignore rejected requests
+                    .lte('start_date', endDateFull) // Existing start must be BEFORE or ON new end
+                    .gte('end_date', startDateFull); // Existing end must be AFTER or ON new start
+
+                if (id) {
+                    query = query.neq('id', id); // Exclude current request if editing
+                }
+
+                const { data: overlaps, error } = await query;
+                if (error) throw error;
+                return overlaps && overlaps.length > 0;
+            };
+
+            const hasOverlap = await checkOverlap();
+            if (hasOverlap) {
+                alert(t('request.overlapError') || "You already have a leave request for this period.");
+                setLoading(false);
+                return;
+            }
+
             const duration = calculateDuration();
 
             const payload = {
                 user_id: user.id,
                 type: selectedType,
-                start_date: formData.startDate + (isHourly ? ` ${formData.startTime}` : ''),
-                end_date: (isHourly ? formData.startDate : formData.endDate) + (isHourly ? ` ${formData.endTime}` : ''),
+                start_date: startDateFull,
+                end_date: endDateFull,
                 days: duration.days,
+                hours: 0, // Using days-based consumption for now
                 reason: formData.reason,
                 status: 'pending'
             };

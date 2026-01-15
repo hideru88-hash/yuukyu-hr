@@ -47,12 +47,23 @@ const HRDashboard: React.FC = () => {
         fetchData();
     }, [fetchData]);
 
+    const [processingId, setProcessingId] = useState<string | null>(null);
+
     const handleAction = async (id: string, action: 'approved' | 'rejected') => {
+        if (!user) return;
+        setProcessingId(id);
+
         try {
             if (action === 'approved') {
-                await approveLeaveRequest(id);
+                // Use the new FIFO Yukyu Rule
+                const { approveLeaveWithYukyuRule } = await import('../src/services/yukyuRule');
+                await approveLeaveWithYukyuRule(id, user.id);
             } else {
                 const reason = window.prompt(t('hr.rejectReasonPrompt') || 'Reason for rejection (optional):');
+                if (reason === null) {
+                    setProcessingId(null);
+                    return; // Looked like cancel
+                }
                 await rejectLeaveRequest(id, reason || undefined);
             }
 
@@ -60,7 +71,9 @@ const HRDashboard: React.FC = () => {
             fetchData();
         } catch (error: any) {
             console.error('Error updating status:', error);
-            alert('Error: ' + error.message);
+            alert('Error: ' + (error.message || 'Unknown error'));
+        } finally {
+            setProcessingId(null);
         }
     };
 
@@ -201,15 +214,24 @@ const HRDashboard: React.FC = () => {
                                                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button
                                                         onClick={() => handleAction(req.id, 'rejected')}
-                                                        className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 transition-all"
+                                                        disabled={processingId === req.id}
+                                                        className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                                     >
                                                         {t('hr.reject')}
                                                     </button>
                                                     <button
                                                         onClick={() => handleAction(req.id, 'approved')}
-                                                        className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:opacity-90 transition-all shadow-md shadow-primary/10"
+                                                        disabled={processingId === req.id}
+                                                        className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:opacity-90 transition-all shadow-md shadow-primary/10 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
                                                     >
-                                                        {t('hr.approve')}
+                                                        {processingId === req.id ? (
+                                                            <>
+                                                                <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                                                <span>...</span>
+                                                            </>
+                                                        ) : (
+                                                            t('hr.approve')
+                                                        )}
                                                     </button>
                                                 </div>
                                             </td>

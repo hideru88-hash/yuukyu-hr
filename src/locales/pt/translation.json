@@ -131,7 +131,8 @@
             "approved": "Aprovado",
             "rejected": "Rejeitado"
         },
-        "rejectionReason": "Motivo da Rejeição"
+        "rejectionReason": "Motivo da Rejeição",
+        "overlapError": "Você já tem uma solicitação de ausência para este período."
     },
     "common": {
         "days": "Dias",

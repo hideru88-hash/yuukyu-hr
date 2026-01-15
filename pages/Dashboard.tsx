@@ -11,6 +11,7 @@ const Dashboard: React.FC = () => {
   const [requests, setRequests] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [realBalance, setRealBalance] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -48,6 +49,16 @@ const Dashboard: React.FC = () => {
         if (!requestError && requestData) {
           setRequests(requestData);
         }
+        // Fetch real balance
+        const { data: balanceData, error: balanceError } = await supabase
+          .from('yukyu_balance_total')
+          .select('total_days')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!balanceError && balanceData) {
+          setRealBalance(Number(balanceData.total_days));
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -59,7 +70,7 @@ const Dashboard: React.FC = () => {
   }, [user]);
 
   const fullName = profile?.full_name || user?.email?.split('@')[0] || 'Employee';
-  const balance = profile?.leave_balance ?? 20;
+  const balance = realBalance ?? 0;
 
   return (
     <div className="px-6 pt-8 pb-24">

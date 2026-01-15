@@ -48,6 +48,14 @@ const HREmployees: React.FC = () => {
 
             if (leaveError) throw leaveError;
 
+            // 3. Fetch Yukyu Balances
+            const { data: balances, error: balanceError } = await supabase
+                .from('yukyu_balance_total')
+                .select('user_id, total_days');
+
+            if (balanceError) throw balanceError;
+
+            const balanceMap = new Map((balances || []).map(b => [b.user_id, b.total_days]));
             const onLeaveIds = new Set((activeLeaves || []).map(l => l.user_id));
 
             const mappedEmployees: Employee[] = profiles.map(p => ({
@@ -57,7 +65,7 @@ const HREmployees: React.FC = () => {
                 avatar_url: p.avatar_url,
                 role: p.role,
                 status: (onLeaveIds.has(p.id) ? 'on_leave' : 'active') as 'active' | 'on_leave',
-                leave_balance: p.leave_balance ?? 20
+                leave_balance: balanceMap.get(p.id) ?? 0 // Default to 0 if no grant/balance found
             }));
 
             setEmployees(mappedEmployees);
