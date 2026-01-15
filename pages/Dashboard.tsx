@@ -154,44 +154,63 @@ const Dashboard: React.FC = () => {
             <div className="text-center py-4 text-gray-400 bg-white rounded-2xl border border-dashed border-gray-200">{t('dashboard.noPlans')}</div>
           ) : (
             requests.map((req) => (
-              <div
-                key={req.id}
-                className={`group flex items-center justify-between p-4 bg-white rounded-2xl shadow-card border border-gray-100 transition-all hover:shadow-md ${req.status === 'pending' ? 'cursor-pointer hover:border-primary/50' : ''}`}
-                onClick={() => {
-                  if (req.status === 'pending') {
-                    navigate(`/request/${req.id}`);
-                  }
-                }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl font-bold leading-none ${req.status === 'approved' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-600'
-                    }`}>
-                    <span className="text-xs uppercase font-semibold opacity-70">{new Date(req.start_date).toLocaleDateString(i18n.language, { month: 'short' })}</span>
-                    <span className="text-lg">{new Date(req.start_date).getDate()}</span>
+              <div key={req.id} className="group flex flex-col bg-white rounded-2xl shadow-card border border-gray-100 transition-all hover:shadow-md overflow-hidden">
+                <div
+                  className={`flex items-center justify-between p-4 ${req.status === 'pending' ? 'cursor-pointer hover:bg-slate-50' : ''}`}
+                  onClick={() => {
+                    if (req.status === 'pending') {
+                      navigate(`/request/${req.id}`);
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-xl font-bold leading-none ${req.status === 'approved' ? 'bg-green-50 text-green-600' :
+                      req.status === 'rejected' ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                      <span className="text-xs uppercase font-semibold opacity-70">{new Date(req.start_date).toLocaleDateString(i18n.language, { month: 'short' })}</span>
+                      <span className="text-lg">{new Date(req.start_date).getDate()}</span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[#131616]">{req.reason || t(`request.${req.type.toLowerCase()}`)}</h3>
+                      <p className="text-sm text-gray-500">{req.days} {t('common.days')} • {t(`request.${req.type.toLowerCase()}`)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-[#131616]">{req.reason || t(`request.${req.type.toLowerCase()}`)}</h3>
-                    <p className="text-sm text-gray-500">{req.days} {t('common.days')} • {t(`request.${req.type.toLowerCase()}`)}</p>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold border ${req.status === 'approved'
+                      ? 'bg-green-50 text-green-700 border-green-100'
+                      : req.status === 'rejected'
+                        ? 'bg-red-50 text-red-700 border-red-100'
+                        : 'bg-amber-50 text-amber-700 border-amber-100'
+                      }`}>
+                      {t(`request.status.${req.status}`)}
+                    </span>
+                    {req.status === 'pending' && (
+                      <button
+                        className="h-8 w-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-primary hover:border-primary transition-colors"
+                        title={t('request.editRequest')}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold border ${req.status === 'approved'
-                    ? 'bg-green-50 text-green-700 border-green-100'
-                    : req.status === 'rejected'
-                      ? 'bg-red-50 text-red-700 border-red-100'
-                      : 'bg-amber-50 text-amber-700 border-amber-100'
-                    }`}>
-                    {t(`request.status.${req.status}`)}
-                  </span>
-                  {req.status === 'pending' && (
-                    <button
-                      className="h-8 w-8 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:text-primary hover:border-primary transition-colors"
-                      title={t('request.editRequest')}
-                    >
-                      <span className="material-symbols-outlined text-[16px]">edit</span>
-                    </button>
-                  )}
-                </div>
+
+                {/* Rejection Note */}
+                {req.status === 'rejected' && req.note && (
+                  <div className="px-4 pb-4 pt-0">
+                    <div className="bg-red-50/50 rounded-xl p-3 border border-red-100/50 flex gap-3">
+                      <span className="material-symbols-outlined text-red-400 text-[18px]">info</span>
+                      <div className="flex flex-col gap-0.5">
+                        <p className="text-[10px] uppercase font-bold text-red-600 tracking-wider">
+                          {t('request.rejectionReason')}
+                        </p>
+                        <p className="text-sm text-red-800 font-medium">
+                          {req.note}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))
           )}

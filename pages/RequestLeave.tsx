@@ -217,7 +217,8 @@ const RequestLeave: React.FC = () => {
                             {[
                                 { id: 'Vacation', label: t('request.vacation'), icon: 'wb_sunny' },
                                 { id: 'Sick', label: t('request.sick'), icon: 'contrast' },
-                                { id: 'Personal', label: t('request.personal'), icon: 'schedule' }
+                                { id: 'Personal', label: t('request.personal'), icon: 'schedule' },
+                                { id: 'Other', label: t('request.other'), icon: 'more_horiz' }
                             ].map((type) => (
                                 <label key={type.id} className="cursor-pointer group relative">
                                     <input

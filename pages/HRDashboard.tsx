@@ -69,6 +69,7 @@ const HRDashboard: React.FC = () => {
         if (t.includes('annual')) return 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400';
         if (t.includes('sick')) return 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400';
         if (t.includes('remote') || t.includes('home')) return 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400';
+        if (t.includes('other')) return 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400';
         return 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
     };
 
@@ -185,7 +186,9 @@ const HRDashboard: React.FC = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getTypeColor(req.type)}`}>
-                                                    {t(`request.${req.type?.toLowerCase()}`)}
+                                                    {req.type?.toLowerCase() === 'other' && req.reason
+                                                        ? req.reason
+                                                        : t(`request.${req.type?.toLowerCase()}`)}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">

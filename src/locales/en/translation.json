@@ -103,6 +103,7 @@
         "vacation": "Vacation",
         "sick": "Sick",
         "personal": "Personal",
+        "other": "Other",
         "period": "Period",
         "start": "Start",
         "end": "End",
@@ -127,7 +128,8 @@
             "pending": "Pending",
             "approved": "Approved",
             "rejected": "Rejected"
-        }
+        },
+        "rejectionReason": "Rejection Reason"
     },
     "common": {
         "days": "Days",

@@ -104,6 +104,7 @@
         "vacation": "Férias",
         "sick": "Doença",
         "personal": "Pessoal",
+        "other": "Outros",
         "period": "Período",
         "start": "Início",
         "end": "Fim",
@@ -128,7 +129,8 @@
             "pending": "Pendente",
             "approved": "Aprovado",
             "rejected": "Rejeitado"
-        }
+        },
+        "rejectionReason": "Motivo da Rejeição"
     },
     "common": {
         "days": "Dias",
