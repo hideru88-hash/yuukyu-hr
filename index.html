@@ -4,57 +4,48 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Yuukyu HR</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
       tailwind.config = {
-        darkMode: 'class',
+        darkMode: "class",
         theme: {
           extend: {
-            fontFamily: {
-              sans: ['Manrope', 'sans-serif'],
-              display: ['Manrope', 'sans-serif'],
-            },
             colors: {
-              primary: {
-                DEFAULT: '#2c6d6d',
-                dark: '#1f4f4f',
-                light: '#e0f2f2',
-              },
-              secondary: '#1d385e',
-              background: {
-                light: '#f9fafa',
-                dark: '#1b293c',
-              },
-              surface: {
-                light: '#ffffff',
-                dark: '#25364b',
-              },
-              accent: {
-                warning: '#E57373',
-                success: '#4CAF50',
-              }
+              "primary": "#193b5c",
+              "background-light": "#f8fafc",
+              "background-dark": "#0f172a",
             },
-            boxShadow: {
-              'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-              'card': '0 2px 8px -1px rgba(0, 0, 0, 0.03)',
-              'float': '0 10px 40px -10px rgba(44, 109, 109, 0.3)',
-            }
+            fontFamily: {
+              "display": ["Work Sans", "sans-serif"],
+              "sans": ["Work Sans", "sans-serif"]
+            },
+            borderRadius: {
+                "DEFAULT": "0.5rem", 
+                "md": "0.5rem",
+                "lg": "0.75rem", 
+                "xl": "1rem", 
+                "full": "9999px"
+            },
           },
         },
       }
     </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100;
+            }
+        }
+    </style>
     <style>
       body {
-        background-color: #f3f4f6; /* Gray-100 for desktop background */
+        min-height: max(884px, 100dvh);
       }
       #root {
         min-height: 100vh;
-        display: flex;
-        justify-content: center;
+        width: 100%;
       }
       .no-scrollbar::-webkit-scrollbar {
         display: none;

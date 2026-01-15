@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 const Profile: React.FC = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
-    const { user, signOut } = useAuth();
+    const { user, signOut, refreshProfile } = useAuth();
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const [fullName, setFullName] = useState<string>('');
@@ -30,7 +30,7 @@ const Profile: React.FC = () => {
     const getProfile = async () => {
         try {
             const { data, error } = await supabase
-                .from('profiles')
+                .from('user_profiles')
                 .select('avatar_url, full_name')
                 .eq('id', user!.id)
                 .single();
@@ -73,7 +73,7 @@ const Profile: React.FC = () => {
             const publicUrl = data.publicUrl;
 
             const { error: updateError } = await supabase
-                .from('profiles')
+                .from('user_profiles')
                 .upsert({
                     id: user!.id,
                     avatar_url: publicUrl,
@@ -96,7 +96,7 @@ const Profile: React.FC = () => {
     const handleNameSave = async () => {
         try {
             const { error } = await supabase
-                .from('profiles')
+                .from('user_profiles')
                 .update({ full_name: newName, updated_at: new Date().toISOString() })
                 .eq('id', user!.id);
 
@@ -104,6 +104,7 @@ const Profile: React.FC = () => {
 
             setFullName(newName);
             setIsEditingName(false);
+            await refreshProfile();
             alert(t('profile.nameUpdated'));
         } catch (error: any) {
             console.error('Error updating name:', error);
@@ -288,13 +289,21 @@ const Profile: React.FC = () => {
                     <h3 className="px-2 text-xs font-bold text-gray-400 uppercase tracking-widest">{t('profile.language')}</h3>
                     <div className="bg-white rounded-2xl shadow-soft border border-gray-100 overflow-hidden p-2 flex items-center gap-2">
                         <button
-                            onClick={() => changeLanguage('en')}
+                            onClick={async () => {
+                                i18n.changeLanguage('en');
+                                await supabase.from('user_profiles').update({ language: 'en' }).eq('id', user?.id);
+                                await refreshProfile();
+                            }}
                             className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${i18n.language.startsWith('en') ? 'bg-primary text-white shadow-md' : 'bg-transparent text-gray-500 hover:bg-gray-50'}`}
                         >
                             English
                         </button>
                         <button
-                            onClick={() => changeLanguage('pt')}
+                            onClick={async () => {
+                                i18n.changeLanguage('pt');
+                                await supabase.from('user_profiles').update({ language: 'pt' }).eq('id', user?.id);
+                                await refreshProfile();
+                            }}
                             className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${i18n.language.startsWith('pt') ? 'bg-primary text-white shadow-md' : 'bg-transparent text-gray-500 hover:bg-gray-50'}`}
                         >
                             Português

@@ -20,7 +20,7 @@ const Dashboard: React.FC = () => {
         setLoading(true);
         // Fetch profile
         const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
+          .from('user_profiles')
           .select('*')
           .eq('id', user.id)
           .single();
@@ -30,8 +30,8 @@ const Dashboard: React.FC = () => {
         } else {
           // Create profile if not exists (simplistic approach for demo)
           const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .upsert({ id: user.id, full_name: user.email?.split('@')[0], leave_balance: 20 })
+            .from('user_profiles')
+            .upsert({ id: user.id, full_name: user.email?.split('@')[0], role: 'employee' })
             .select()
             .single();
           if (!createError) setProfile(newProfile);

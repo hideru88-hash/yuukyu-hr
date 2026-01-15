@@ -48,7 +48,7 @@ const Calendar: React.FC = () => {
                 const userIds = Array.from(new Set(leavesData.map(l => l.user_id)));
                 if (userIds.length > 0) {
                     const { data: profilesData, error: profilesError } = await supabase
-                        .from('profiles')
+                        .from('user_profiles')
                         .select('id, full_name, avatar_url') // Assuming these fields exist
                         .in('id', userIds);
 

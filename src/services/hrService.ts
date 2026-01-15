@@ -12,7 +12,7 @@ export interface PendingRequest {
     priority: string;
     created_at: string;
     note: string | null;
-    profiles: {
+    user_profiles: {
         full_name: string;
         avatar_url: string | null;
         department: string | null;
@@ -106,7 +106,7 @@ export async function searchEmployees(
     const offset = (page - 1) * pageSize;
 
     let queryBuilder = supabase
-        .from('profiles')
+        .from('user_profiles')
         .select('id, full_name, department, avatar_url, role', { count: 'exact' });
 
     if (query.trim()) {
@@ -133,7 +133,7 @@ export async function getPriorityApprovals(limit: number = 10): Promise<PendingR
         .from('leave_requests')
         .select(`
             *,
-            profiles (full_name, avatar_url, department)
+            user_profiles (full_name, avatar_url, department)
         `)
         .eq('status', 'pending')
         .order('priority', { ascending: false }) // 'high' comes before 'normal'
@@ -196,4 +196,24 @@ export async function rejectLeaveRequest(id: string, reason?: string): Promise<v
  */
 export async function getAllPendingRequests(): Promise<PendingRequest[]> {
     return getPriorityApprovals(100);
+}
+
+/**
+ * Get upcoming absences (approved requests starting in the future)
+ */
+export async function getUpcomingAbsences(limit: number = 5): Promise<any[]> {
+    const today = new Date().toISOString().split('T')[0];
+    const { data, error } = await supabase
+        .from('leave_requests')
+        .select(`
+            *,
+            user_profiles (full_name, avatar_url)
+        `)
+        .eq('status', 'approved')
+        .gt('start_date', today)
+        .order('start_date', { ascending: true })
+        .limit(limit);
+
+    if (error) throw error;
+    return data || [];
 }
