@@ -7,6 +7,7 @@ const Calendar: React.FC = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [leaves, setLeaves] = useState<any[]>([]);
     const [profiles, setProfiles] = useState<any>({});
     const [loading, setLoading] = useState(true);
@@ -113,7 +114,7 @@ const Calendar: React.FC = () => {
         });
     };
 
-    const todaysLeaves = getLeavesForDate(new Date());
+    const selectedLeaves = getLeavesForDate(selectedDate);
 
     return (
         <div className="pb-8 bg-background-light min-h-screen">
@@ -163,21 +164,35 @@ const Calendar: React.FC = () => {
 
                             const dayLeaves = getLeavesForDate(date);
                             const hasLeaves = dayLeaves.length > 0;
+
+                            // Check if this date corresponds to the currently selected date
+                            const isSelected = selectedDate.toDateString() === date.toDateString();
                             const isToday = new Date().toDateString() === date.toDateString();
 
                             return (
                                 <button
                                     key={idx}
-                                    className={`aspect-square relative flex flex-col items-center justify-start pt-2 rounded-xl transition-all ${isToday ? 'bg-primary/5 border border-primary/20' : 'hover:bg-gray-50'}`}
+                                    onClick={() => setSelectedDate(date)}
+                                    className={`aspect-square relative flex flex-col items-center justify-start pt-2 rounded-xl transition-all 
+                                        ${isSelected ? 'bg-primary text-white shadow-md scale-105 z-10' :
+                                            isToday ? 'bg-primary/5 border border-primary/20' : 'hover:bg-gray-50'}`}
                                 >
-                                    <span className={`text-sm font-medium ${isToday ? 'text-primary font-bold' : 'text-[#131616]'}`}>{date.getDate()}</span>
+                                    <span className={`text-sm font-medium ${isSelected ? 'text-white' : isToday ? 'text-primary font-bold' : 'text-[#131616]'}`}>
+                                        {date.getDate()}
+                                    </span>
                                     {hasLeaves && (
                                         <div className="mt-1 flex gap-0.5 justify-center flex-wrap px-1">
                                             {dayLeaves.slice(0, 3).map((leave, i) => {
-                                                const color = leave.type === 'Vacation' ? 'bg-primary' : leave.type === 'Sick' ? 'bg-orange-400' : 'bg-purple-400';
-                                                return <div key={i} className={`h-1.5 w-1.5 rounded-full ${color}`} title={profiles[leave.user_id]?.full_name}></div>
+                                                const baseColor = leave.type === 'Vacation' ? 'bg-primary' : leave.type === 'Sick' ? 'bg-orange-400' : 'bg-purple-400';
+                                                // If selected, we need to make dots visible against primary bg (white usually)
+                                                // But usually standard colors are fine or white. Let's use white if selected for contrast?
+                                                // Actually primary on primary is bad. 
+                                                // If selected (bg-primary), dots should be white or distinct.
+                                                const dotColor = isSelected ? 'bg-white' : baseColor;
+
+                                                return <div key={i} className={`h-1.5 w-1.5 rounded-full ${dotColor}`} title={profiles[leave.user_id]?.full_name}></div>
                                             })}
-                                            {dayLeaves.length > 3 && <div className="h-1.5 w-1.5 rounded-full bg-gray-300"></div>}
+                                            {dayLeaves.length > 3 && <div className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white/50' : 'bg-gray-300'}`}></div>}
                                         </div>
                                     )}
                                 </button>
@@ -204,22 +219,47 @@ const Calendar: React.FC = () => {
 
             {/* Daily Breakdown */}
             <div className="px-5">
-                <h3 className="text-[#131616] text-lg font-bold leading-tight tracking-tight pb-4">
-                    {t('calendar.whoIsAway')} ({todaysLeaves.length})
-                </h3>
+                <div className="flex items-center justify-between pb-4">
+                    <h3 className="text-[#131616] text-lg font-bold leading-tight tracking-tight">
+                        {t('calendar.whoIsAway')} ({selectedLeaves.length})
+                    </h3>
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                        {selectedDate.toLocaleDateString(i18n.language, { day: 'numeric', month: 'short' })}
+                    </span>
+                </div>
+
                 <div className="flex flex-col gap-3">
                     {loading ? (
                         <div className="text-center py-4 text-gray-400">{t('dashboard.loading')}</div>
-                    ) : todaysLeaves.length === 0 ? (
+                    ) : selectedLeaves.length === 0 ? (
                         <div className="text-center py-8 text-gray-400 bg-white rounded-2xl border border-dashed border-gray-200">
                             {t('calendar.noAbsences')}
                         </div>
                     ) : (
-                        todaysLeaves.map((leave, idx) => {
+                        selectedLeaves.map((leave, idx) => {
                             const profile = profiles[leave.user_id] || { full_name: 'Unknown' };
-                            const color = leave.type === 'Vacation' ? 'primary' : leave.type === 'Sick' ? 'orange-400' : 'purple-400';
-                            const icon = leave.type === 'Vacation' ? 'flight' : leave.type === 'Sick' ? 'medication' : 'person';
-                            const bgColor = leave.type === 'Vacation' ? 'bg-primary' : leave.type === 'Sick' ? 'bg-orange-400' : 'bg-purple-400';
+                            // If user is selected ("Others" type might be missing color in original code?)
+                            // Original code had vacation/sick/personal mapped.
+                            // Let's add 'Other' mapping if needed, or fallback.
+                            // Leave types are 'Vacation', 'Sick', 'Personal', 'Other'.
+
+                            const isVacation = leave.type === 'Vacation';
+                            const isSick = leave.type === 'Sick';
+
+                            let color = 'purple-400';
+                            let icon = 'person';
+                            let bgColor = 'bg-purple-400';
+
+                            if (isVacation) {
+                                color = 'primary';
+                                icon = 'flight';
+                                bgColor = 'bg-primary';
+                            } else if (isSick) {
+                                color = 'orange-400';
+                                icon = 'medication';
+                                bgColor = 'bg-orange-400';
+                            }
+                            // Personal/Other default to purple
 
                             return (
                                 <div key={idx} className="group relative flex items-center gap-4 bg-white p-4 rounded-xl border border-black/5 shadow-sm transition-all hover:shadow-md">

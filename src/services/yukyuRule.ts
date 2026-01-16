@@ -69,15 +69,15 @@ export async function approveLeaveWithYukyuRule(leaveRequestId: string, approver
     // I'll proceed with consumption logic regardless of type for now, OR better, check if type is 'Vacation'.
     // Let's assume 'Vacation' for consumption.
 
-    if (request.type !== 'Vacation') {
-        console.log(`[YukyuRule] Request type '${request.type}' is not Vacation. Skipping Yukyu consumption logic.`);
-        const { error } = await supabase
-            .from('leave_requests')
-            .update({ status: 'approved' })
-            .eq('id', leaveRequestId);
-        if (error) throw error;
-        return;
-    }
+
+    // We used to fail-safe check for 'Vacation' type only, but in Japan context (Yuukyu),
+    // employees use Paid Leave for Sick, Personal, and Other reasons too.
+    // If the system should support "Unpaid Leave", we would need a specific flag or type.
+    // For now, based on user feedback, we treat all configured request types as consuming Balance.
+    // if (request.type !== 'Vacation') {
+    //    ...
+    // }
+
 
     const requestedDays = request.days || 0;
     const requestedHours = request.hours || 0;
