@@ -56,8 +56,11 @@
     },
     "dashboard": {
         "goodMorning": "Bom dia",
-        "daysLeft": "Dias Restantes",
-        "totalAllowance": "Total Disponível",
+        "daysLeft": "DIAS RESTANTES",
+        "totalAllowance": "Subsídio Total",
+        "added": "Adicionado",
+        "next": "Próximo",
+        "on": "em",
         "requestTimeOff": "Solicitar\nFolga",
         "teamCalendar": "Calendário\nda Equipe",
         "expiringSoon": "Expirando em Breve",
@@ -65,7 +68,11 @@
         "upcomingPlans": "Próximas Férias",
         "seeAll": "Ver Tudo",
         "noPlans": "Nenhum plano de férias futuro.",
-        "loading": "Carregando..."
+        "loading": "Carregando...",
+        "safeBalance": "Saldo Seguro 😎",
+        "noExpiringSoon": "Seu saldo está seguro pelos próximos 3 meses.",
+        "emptyBalanceTitle": "Sem Saldo de Férias",
+        "emptyBalanceMessage": "Você não tem dias disponíveis no momento."
     },
     "profile": {
         "title": "Perfil",
@@ -134,9 +141,29 @@
         "rejectionReason": "Motivo da Rejeição",
         "overlapError": "Você já tem uma solicitação de ausência para este período."
     },
+    "validation": {
+        "insufficientBalance": "Saldo insuficiente para esta solicitação."
+    },
+    "requestDetails": {
+        "title": "Detalhes da Solicitação",
+        "approvedMessage": "Sua licença está confirmada.",
+        "rejectedMessage": "Sua solicitação foi recusada.",
+        "pendingMessage": "Aguardando aprovação.",
+        "timeline": "Linha do Tempo",
+        "requestSent": "Solicitação Enviada",
+        "approvedByManager": "Aprovado pelo Gestor",
+        "rejectedByManager": "Rejeitado pelo Gestor",
+        "waitingForAction": "Aguardando análise...",
+        "downloadPdf": "Baixar Comprovante (PDF)",
+        "reportError": "Reportar um erro ou cancelar"
+    },
     "common": {
         "days": "Dias",
-        "day": "Dia"
+        "day": "Dia",
+        "justNow": "Agora mesmo",
+        "minutesAgo": "Há {{count}} minutos",
+        "hoursAgo": "Há {{count}} horas",
+        "daysAgo": "Há {{count}} dias"
     },
     "nav": {
         "home": "Início",
@@ -150,5 +177,19 @@
         "whoIsAway": "Quem está fora",
         "noAbsences": "Ninguém de folga hoje",
         "today": "Hoje"
+    },
+    "notifications": {
+        "request_created": {
+            "title": "Nova Solicitação de Férias",
+            "body": "{{name}} solicitou férias."
+        },
+        "request_approved": {
+            "title": "Solicitação Aprovada",
+            "body": "Sua solicitação foi aprovada."
+        },
+        "request_rejected": {
+            "title": "Solicitação Rejeitada",
+            "body": "Sua solicitação foi rejeitada."
+        }
     }
 }

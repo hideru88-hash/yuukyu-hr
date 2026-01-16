@@ -11,6 +11,7 @@ const Profile: React.FC = () => {
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const [fullName, setFullName] = useState<string>('');
+    const [hireDate, setHireDate] = useState<string | null>(null);
 
     // Name editing state
     const [isEditingName, setIsEditingName] = useState(false);
@@ -31,7 +32,7 @@ const Profile: React.FC = () => {
         try {
             const { data, error } = await supabase
                 .from('user_profiles')
-                .select('avatar_url, full_name')
+                .select('avatar_url, full_name, hire_date')
                 .eq('id', user!.id)
                 .single();
 
@@ -42,6 +43,7 @@ const Profile: React.FC = () => {
             if (data) {
                 setAvatarUrl(data.avatar_url);
                 setFullName(data.full_name);
+                setHireDate(data.hire_date);
                 setNewName(data.full_name || '');
             }
         } catch (error) {
@@ -231,7 +233,9 @@ const Profile: React.FC = () => {
                                     </div>
                                     <span className="text-sm font-semibold text-gray-600">{t('profile.hireDate')}</span>
                                 </div>
-                                <span className="text-sm font-bold text-[#121517]">15 Jan, 2020</span>
+                                <span className="text-sm font-bold text-[#121517]">
+                                    {hireDate ? new Date(hireDate).toLocaleDateString(i18n.language, { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                                </span>
                             </div>
                             <div className="flex justify-between items-center group">
                                 <div className="flex items-center gap-3">

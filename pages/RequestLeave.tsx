@@ -20,11 +20,54 @@ const RequestLeave: React.FC = () => {
         reason: '',
     });
 
+    const [balance, setBalance] = useState<number>(0);
+    const [pendingDays, setPendingDays] = useState<number>(0);
+    const [isBalanceLoading, setIsBalanceLoading] = useState(true);
+
     useEffect(() => {
         if (id && user) {
             fetchRequest();
         }
+        if (user) {
+            fetchBalance();
+        }
     }, [id, user]);
+
+    const fetchBalance = async () => {
+        try {
+            setIsBalanceLoading(true);
+            // 1. Get total authorized balance (Grants - Apporoved Usage)
+            const { data: balanceData } = await supabase
+                .from('yukyu_balance_total')
+                .select('total_days')
+                .eq('user_id', user!.id)
+                .single();
+
+            const total = Number(balanceData?.total_days ?? 0);
+            setBalance(total);
+
+            // 2. Get pending usage (Pending Requests that haven't deducted from balance yet)
+            // Note: If we are editing an existing pending request, we shouldn't count it double against itself
+            let query = supabase
+                .from('leave_requests')
+                .select('days')
+                .eq('user_id', user!.id)
+                .eq('status', 'pending');
+
+            if (id) {
+                query = query.neq('id', id);
+            }
+
+            const { data: pendingData } = await query;
+            const pending = pendingData?.reduce((acc, curr) => acc + Number(curr.days), 0) ?? 0;
+            setPendingDays(pending);
+
+        } catch (error) {
+            console.error('Error fetching balance:', error);
+        } finally {
+            setIsBalanceLoading(false);
+        }
+    };
 
     const fetchRequest = async () => {
         try {
@@ -133,6 +176,18 @@ const RequestLeave: React.FC = () => {
         setLoading(true);
 
         try {
+            const duration = calculateDuration();
+
+            // --- BALANCE VALIDATION ---
+            if (selectedType === 'Vacation') {
+                const effectiveBalance = balance - pendingDays;
+                if (duration.days > effectiveBalance) {
+                    alert(`${t('validation.insufficientBalance') || 'Saldo insuficiente.'} (Available: ${effectiveBalance.toFixed(1)} days)`);
+                    setLoading(false);
+                    return;
+                }
+            }
+
             // Construct full ISO strings for consistency in comparison
             const startDateFull = formData.startDate + (isHourly ? ` ${formData.startTime}` : '');
             const endDateFull = (isHourly ? formData.startDate : formData.endDate) + (isHourly ? ` ${formData.endTime}` : '');
@@ -161,8 +216,6 @@ const RequestLeave: React.FC = () => {
                 setLoading(false);
                 return;
             }
-
-            const duration = calculateDuration();
 
             const payload = {
                 user_id: user.id,
@@ -228,9 +281,18 @@ const RequestLeave: React.FC = () => {
                     <div className="relative z-10 p-6 flex flex-col items-center justify-center gap-1">
                         <span className="text-white/80 text-sm font-medium tracking-wide uppercase">{t('request.availableBalance')}</span>
                         <div className="flex items-baseline gap-1">
-                            <span className="text-5xl font-extrabold tracking-tight">15</span>
+                            {isBalanceLoading ? (
+                                <span className="text-2xl font-bold opacity-50">...</span>
+                            ) : (
+                                <span className="text-5xl font-extrabold tracking-tight">{balance}</span>
+                            )}
                             <span className="text-xl font-medium text-white/90">{t('common.days')}</span>
                         </div>
+                        {pendingDays > 0 && (
+                            <div className="mt-2 text-white/70 text-xs font-bold bg-white/10 px-2 py-1 rounded-lg">
+                                -{pendingDays} {t('status.pending')}
+                            </div>
+                        )}
                         <div className="mt-4 flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
                             <span className="material-symbols-outlined text-[14px]">history</span>
                             {t('request.validUntil', { date: 'Dec 2024' })}

@@ -12,6 +12,20 @@ const Dashboard: React.FC = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [realBalance, setRealBalance] = useState<number | null>(null);
+  const [expiringData, setExpiringData] = useState<{ count: number, date: string } | null>(null);
+  const [grantInfo, setGrantInfo] = useState<{ last: { days: number, date: string } | null, next: { days: number, date: string } | null }>(null);
+
+  // Helper to calculate Yūkyū entitlement based on service months
+  const getYukyuEntitlement = (months: number) => {
+    if (months < 6) return 0;
+    if (months < 18) return 10; // 0.5 year
+    if (months < 30) return 11; // 1.5 year
+    if (months < 42) return 12; // 2.5 year
+    if (months < 54) return 14; // 3.5 year
+    if (months < 66) return 16; // 4.5 year
+    if (months < 78) return 18; // 5.5 year
+    return 20; // 6.5+ years
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -26,8 +40,10 @@ const Dashboard: React.FC = () => {
           .eq('id', user.id)
           .single();
 
+        let currentProfile = null;
         if (!profileError && profileData) {
           setProfile(profileData);
+          currentProfile = profileData;
         } else {
           // Create profile if not exists (simplistic approach for demo)
           const { data: newProfile, error: createError } = await supabase
@@ -35,7 +51,10 @@ const Dashboard: React.FC = () => {
             .upsert({ id: user.id, full_name: user.email?.split('@')[0], role: 'employee' })
             .select()
             .single();
-          if (!createError) setProfile(newProfile);
+          if (!createError) {
+            setProfile(newProfile);
+            currentProfile = newProfile;
+          }
         }
 
         // Fetch requests
@@ -59,6 +78,70 @@ const Dashboard: React.FC = () => {
         if (!balanceError && balanceData) {
           setRealBalance(Number(balanceData.total_days));
         }
+
+        // Fetch expiring grants
+        const today = new Date();
+        const threeMonthsFromNow = new Date();
+        threeMonthsFromNow.setMonth(today.getMonth() + 3);
+
+        const { data: grantsData, error: grantsError } = await supabase
+          .from('yukyu_balance_by_grant')
+          .select('remaining_days, expires_on')
+          .eq('user_id', user.id)
+          .gt('remaining_days', 0)
+          .gt('expires_on', today.toISOString().split('T')[0]) // Only future expirations
+          .lte('expires_on', threeMonthsFromNow.toISOString().split('T')[0]) // Within 3 months
+          .order('expires_on', { ascending: true }); // Get soonest first
+
+        if (!grantsError && grantsData && grantsData.length > 0) {
+          // Sum up days for all grants expiring in this window
+          const totalExpiring = grantsData.reduce((sum, g) => sum + Number(g.remaining_days), 0);
+          // Use the soonest expiration date
+          setExpiringData({
+            count: totalExpiring,
+            date: grantsData[0].expires_on
+          });
+        } else {
+          setExpiringData(null);
+        }
+
+        // --- NEW: Calculate Next Grant & Fetch Last Grant ---
+        if (currentProfile && currentProfile.hire_date) {
+          const hireDate = new Date(currentProfile.hire_date);
+          const now = new Date();
+          let nextGrant = null;
+
+          // Logic: Iterate 0.5, 1.5, 2.5... years from hire date to find first FUTURE date
+          // Start from 6 months
+          for (let m = 6; m <= 1200; m += 12) { // 100 years max loop safety
+            const potentialGrantDate = new Date(hireDate);
+            potentialGrantDate.setMonth(hireDate.getMonth() + m);
+
+            if (potentialGrantDate > now) {
+              // Found the next grant!
+              nextGrant = {
+                date: potentialGrantDate.toISOString().split('T')[0],
+                days: getYukyuEntitlement(m)
+              };
+              break;
+            }
+          }
+
+          // Fetch Last Actual Grant from DB
+          const { data: lastGrantData } = await supabase
+            .from('yukyu_grants')
+            .select('days_granted, grant_date')
+            .eq('user_id', user.id)
+            .order('grant_date', { ascending: false })
+            .limit(1)
+            .single();
+
+          setGrantInfo({
+            last: lastGrantData ? { days: Number(lastGrantData.days_granted), date: lastGrantData.grant_date } : null,
+            next: nextGrant
+          });
+        }
+
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -88,24 +171,46 @@ const Dashboard: React.FC = () => {
 
       {/* Hero Stats Circle */}
       <section className="mt-6 mb-8 flex flex-col items-center justify-center relative">
-        <div className="relative w-64 h-64 flex items-center justify-center">
+        <div className="relative w-48 h-48 flex items-center justify-center">
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-            <path className="fill-none stroke-gray-200 stroke-[2.5]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+            <path className="fill-none stroke-gray-200 stroke-[3]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
             <path
-              className="fill-none stroke-primary stroke-[2.5]"
-              strokeDasharray={`${(balance / 20) * 100}, 100`}
+              className="fill-none stroke-[#1e293b] stroke-[3]"
+              strokeDasharray={`${Math.min((balance / 40) * 100, 100)}, 100`}
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
               style={{ strokeLinecap: 'round' }}
             ></path>
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-6xl font-bold text-[#131616] tracking-tighter leading-none">{balance}</span>
-            <span className="text-sm font-medium text-gray-500 mt-1 uppercase tracking-wider">{t('dashboard.daysLeft')}</span>
+            <span className="text-5xl font-black text-[#131616] tracking-tighter leading-none">{balance}</span>
+            <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">{t('dashboard.daysLeft')}</span>
           </div>
         </div>
-        <div className="mt-[-1rem] bg-white py-2 px-6 rounded-full shadow-card border border-gray-100 flex items-center gap-2 z-10">
-          <span className="h-2 w-2 rounded-full bg-gray-300"></span>
-          <p className="text-sm font-semibold text-gray-600">{t('dashboard.totalAllowance')}: <span className="text-[#131616]">20 {t('common.days')}</span></p>
+
+        {/* Added / Next Grant Info */}
+        <div className="mt-6 bg-white py-3 px-5 rounded-2xl shadow-sm border border-gray-50 flex flex-col gap-1 w-full max-w-xs">
+          {grantInfo?.last && (
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                <span className="font-bold text-gray-700">{t('dashboard.added')}</span>
+              </div>
+              <div className="font-mono text-gray-600">
+                <span className="font-bold text-gray-900">{grantInfo.last.days} {t('common.days')}</span> {t('dashboard.on')} {new Date(grantInfo.last.date).toLocaleDateString(i18n.language)}
+              </div>
+            </div>
+          )}
+          {grantInfo?.next && (
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                <span className="font-bold text-gray-700">{t('dashboard.next')}</span>
+              </div>
+              <div className="font-mono text-gray-600">
+                <span className="font-bold text-gray-900">{grantInfo.next.days} {t('common.days')}</span> {t('dashboard.on')} {new Date(grantInfo.next.date).toLocaleDateString(i18n.language)}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -135,23 +240,52 @@ const Dashboard: React.FC = () => {
         </button>
       </section>
 
-      {/* Expiring Alert */}
-      <section className="mb-8">
-        <div className="flex items-start gap-4 p-4 rounded-2xl bg-red-50 border border-red-100">
-          <div className="shrink-0 p-2 bg-white rounded-full text-accent-warning shadow-sm">
-            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>hourglass_top</span>
+      {/* Expiring Alert - Dynamic Rendering */}
+      {balance === 0 ? (
+        <section className="mb-8 animate-in fade-in slide-in-from-bottom-2 duration-700">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100">
+            <div className="shrink-0 p-2 bg-white rounded-full text-gray-400 shadow-sm">
+              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>info</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-bold text-[#131616]">{t('dashboard.emptyBalanceTitle')}</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {t('dashboard.emptyBalanceMessage')}
+              </p>
+            </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <h3 className="font-bold text-[#131616]">{t('dashboard.expiringSoon')}</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              <Trans i18nKey="dashboard.expiringMessage" values={{ count: 3, date: new Date(new Date().getFullYear(), 2, 31).toLocaleDateString(i18n.language, { month: 'long', day: 'numeric' }) }}>
-                You have <span className="font-bold text-accent-warning">3 days</span> that will expire on March 31st. Plan ahead!
-              </Trans>
-            </p>
+        </section>
+      ) : expiringData ? (
+        <section className="mb-8 animate-in fade-in slide-in-from-bottom-2 duration-700">
+          <div className="flex items-start gap-4 p-4 rounded-2xl bg-red-50 border border-red-100">
+            <div className="shrink-0 p-2 bg-white rounded-full text-accent-warning shadow-sm">
+              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>hourglass_top</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-bold text-[#131616]">{t('dashboard.expiringSoon')}</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                <Trans i18nKey="dashboard.expiringMessage" values={{ count: expiringData.count, date: new Date(expiringData.date).toLocaleDateString(i18n.language, { month: 'long', day: 'numeric' }) }}>
+                  You have <span className="font-bold text-accent-warning">{expiringData.count} days</span> that will expire on {new Date(expiringData.date).toLocaleDateString()}. Plan ahead!
+                </Trans>
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
-
+        </section>
+      ) : (
+        <section className="mb-8 animate-in fade-in slide-in-from-bottom-2 duration-700">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-green-50 border border-green-100">
+            <div className="shrink-0 p-2 bg-white rounded-full text-green-500 shadow-sm">
+              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>verified_user</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-bold text-[#131616]">{t('dashboard.safeBalance', 'Balance Safe')}</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {t('dashboard.noExpiringSoon', 'Your leave balance is safe for the next 3 months.')}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
       {/* Upcoming Plans */}
       <section>
         <div className="flex items-center justify-between mb-4">
@@ -167,10 +301,12 @@ const Dashboard: React.FC = () => {
             requests.map((req) => (
               <div key={req.id} className="group flex flex-col bg-white rounded-2xl shadow-card border border-gray-100 transition-all hover:shadow-md overflow-hidden">
                 <div
-                  className={`flex items-center justify-between p-4 ${req.status === 'pending' ? 'cursor-pointer hover:bg-slate-50' : ''}`}
+                  className={`flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50`}
                   onClick={() => {
                     if (req.status === 'pending') {
                       navigate(`/request/${req.id}`);
+                    } else {
+                      navigate(`/request-details/${req.id}`);
                     }
                   }}
                 >

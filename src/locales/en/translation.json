@@ -55,8 +55,11 @@
     },
     "dashboard": {
         "goodMorning": "Good Morning",
-        "daysLeft": "Days Left",
+        "daysLeft": "DAYS LEFT",
         "totalAllowance": "Total Allowance",
+        "added": "Added",
+        "next": "Next",
+        "on": "on",
         "requestTimeOff": "Request\nTime Off",
         "teamCalendar": "Team\nCalendar",
         "expiringSoon": "Expiring Soon",
@@ -64,7 +67,11 @@
         "upcomingPlans": "Upcoming Plans",
         "seeAll": "See All",
         "noPlans": "No upcoming leave plans.",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "safeBalance": "Balance Safe 😎",
+        "noExpiringSoon": "Your leave balance is safe for the next 3 months.",
+        "emptyBalanceTitle": "No Leave Balance",
+        "emptyBalanceMessage": "You currently have no leave days available."
     },
     "profile": {
         "title": "Profile",
@@ -133,9 +140,29 @@
         "rejectionReason": "Rejection Reason",
         "overlapError": "You already have a leave request for this period."
     },
+    "validation": {
+        "insufficientBalance": "Insufficient balance for this request."
+    },
+    "requestDetails": {
+        "title": "Request Details",
+        "approvedMessage": "Your leave is confirmed.",
+        "rejectedMessage": "Your request was rejected.",
+        "pendingMessage": "Waiting for approval.",
+        "timeline": "Timeline",
+        "requestSent": "Request Sent",
+        "approvedByManager": "Approved by Manager",
+        "rejectedByManager": "Rejected by Manager",
+        "waitingForAction": "Waiting for review...",
+        "downloadPdf": "Download Receipt (PDF)",
+        "reportError": "Report an error or cancel"
+    },
     "common": {
         "days": "Days",
-        "day": "Day"
+        "day": "Day",
+        "justNow": "Just now",
+        "minutesAgo": "{{count}} minutes ago",
+        "hoursAgo": "{{count}} hours ago",
+        "daysAgo": "{{count}} days ago"
     },
     "nav": {
         "home": "Home",
@@ -149,5 +176,19 @@
         "whoIsAway": "Who is away",
         "noAbsences": "No absences today",
         "today": "Today"
+    },
+    "notifications": {
+        "request_created": {
+            "title": "New Leave Request",
+            "body": "{{name}} submitted a leave request."
+        },
+        "request_approved": {
+            "title": "Leave Request Approved",
+            "body": "Your leave request has been approved."
+        },
+        "request_rejected": {
+            "title": "Leave Request Rejected",
+            "body": "Your leave request has been rejected."
+        }
     }
 }

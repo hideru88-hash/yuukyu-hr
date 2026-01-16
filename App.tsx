@@ -12,6 +12,7 @@ import HREmployees from './pages/HREmployees';
 import HRSettings from './pages/HRSettings';
 import Reports from './pages/Reports';
 import Profile from './pages/Profile';
+import RequestDetails from './pages/RequestDetails';
 import ManagerLogin from './pages/ManagerLogin';
 import Manager2FA from './pages/Manager2FA';
 import ManagerLayout from './src/components/ManagerLayout';
@@ -107,6 +108,7 @@ const AppRoutes: React.FC = () => {
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="request" element={<RequestLeave />} />
                   <Route path="request/:id" element={<RequestLeave />} />
+                  <Route path="request-details/:id" element={<RequestDetails />} />
                   <Route path="calendar" element={<Calendar />} />
                   <Route path="reports" element={<Reports />} />
                   <Route path="profile" element={<Profile />} />

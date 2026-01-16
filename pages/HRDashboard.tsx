@@ -288,9 +288,24 @@ const HRDashboard: React.FC = () => {
                                                 }`}></div>
                                             <div>
                                                 <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-                                                    <span className="font-bold text-slate-900 dark:text-slate-200">{notif.title}</span>
+                                                    <span className="font-bold text-slate-900 dark:text-slate-200">
+                                                        {['request_created', 'request_approved', 'request_rejected'].includes(notif.kind)
+                                                            ? t(`notifications.${notif.kind}.title`)
+                                                            : notif.title}
+                                                    </span>
                                                     <br />
-                                                    {notif.body}
+                                                    {(() => {
+                                                        if (notif.kind === 'request_created') {
+                                                            // Try to extract name from English body "Name submitted a leave request."
+                                                            const match = notif.body.match(/^(.*?) submitted a leave/);
+                                                            const name = match ? match[1] : 'An employee';
+                                                            return t('notifications.request_created.body', { name });
+                                                        }
+                                                        if (['request_approved', 'request_rejected'].includes(notif.kind)) {
+                                                            return t(`notifications.${notif.kind}.body`);
+                                                        }
+                                                        return notif.body;
+                                                    })()}
                                                 </p>
                                                 <p className="text-[10px] text-slate-400 mt-0.5">{getRelativeTime(notif.created_at)}</p>
                                             </div>
