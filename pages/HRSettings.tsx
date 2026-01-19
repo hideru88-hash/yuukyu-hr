@@ -181,6 +181,7 @@ const HRSettings: React.FC = () => {
                                 >
                                     <option value="en">English (US)</option>
                                     <option value="pt">Português (Brasil)</option>
+                                    <option value="ja">日本語 (Japanese)</option>
                                 </select>
                             </div>
                         </div>

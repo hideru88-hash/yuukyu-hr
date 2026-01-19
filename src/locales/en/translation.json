@@ -14,6 +14,20 @@
         "loading": "Loading...",
         "checkEmail": "Please check your email for confirmation link!"
     },
+    "managerLogin": {
+        "portalLabel": "Manager Portal",
+        "title": "Administrative Access",
+        "subtitle": "Enter your corporate credentials to access the management dashboard.",
+        "emailLabel": "Corporate Email",
+        "passwordLabel": "Password",
+        "forgotPassword": "Forgot?",
+        "2faWarning": "This portal requires <bold>Two-Factor Authentication (2FA)</bold> active for administrative access.",
+        "submitButton": "Log In",
+        "copyright": "© 2026 Yuukyu Management Systems.",
+        "restrictedAccess": "Restricted use for authorized employees.",
+        "unauthorizedError": "Unauthorized access. This portal is for managers only.",
+        "loginFailed": "Failed to log in"
+    },
     "hr": {
         "panel": "HR Panel",
         "searchPlaceholder": "Search employees, requests, or reports...",

@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import AuthCard from '../src/components/AuthCard';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 
 const ManagerLogin: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -40,7 +40,7 @@ const ManagerLogin: React.FC = () => {
             // Allow 'manager' AND 'hr_admin' as they are technically managers in this context
             if (profile.role !== 'manager' && profile.role !== 'hr_admin') {
                 await supabase.auth.signOut();
-                throw new Error("Acesso não autorizado. Este portal é apenas para gestores.");
+                throw new Error(t('managerLogin.unauthorizedError'));
             }
 
             // 3. Redirect to 2FA
@@ -48,7 +48,7 @@ const ManagerLogin: React.FC = () => {
 
         } catch (err: any) {
             console.error('Login error:', err);
-            setError(err.message || 'Falha ao entrar no sistema');
+            setError(err.message || t('managerLogin.loginFailed'));
         } finally {
             setLoading(false);
         }
@@ -62,6 +62,24 @@ const ManagerLogin: React.FC = () => {
                 <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-400/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3"></div>
             </div>
 
+            {/* Language Selector */}
+            <div className="absolute top-6 right-6 z-20">
+                <div className="relative group">
+                    <select
+                        value={i18n.language.split('-')[0]}
+                        onChange={(e) => i18n.changeLanguage(e.target.value)}
+                        className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-sm font-semibold text-[#193b5c] focus:outline-none focus:ring-2 focus:ring-[#193b5c]/20 appearance-none cursor-pointer hover:bg-white transition-all shadow-sm"
+                    >
+                        <option value="en">🇺🇸 English</option>
+                        <option value="pt">🇧🇷 Português</option>
+                        <option value="ja">🇯🇵 日本語</option>
+                    </select>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                    </div>
+                </div>
+            </div>
+
             <div className="mb-8 z-10 flex flex-col items-center gap-4">
                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg transform -rotate-6">
                     <span className="material-symbols-outlined text-[#193b5c] text-4xl">domain</span>
@@ -69,13 +87,13 @@ const ManagerLogin: React.FC = () => {
                 <div className="text-center">
                     <h1 className="text-3xl font-extrabold text-[#193b5c] tracking-tight">Yuukyu</h1>
                     <div className="mt-1 px-3 py-1 bg-[#193b5c]/10 rounded-full inline-block">
-                        <p className="text-[#193b5c] text-[10px] font-bold uppercase tracking-widest">Portal do Gestor</p>
+                        <p className="text-[#193b5c] text-[10px] font-bold uppercase tracking-widest">{t('managerLogin.portalLabel')}</p>
                     </div>
                 </div>
             </div>
 
             <div className="w-full max-w-md z-10">
-                <AuthCard title="Acesso Administrativo" subtitle="Entre com suas credenciais corporativas para acessar o painel de gestão.">
+                <AuthCard title={t('managerLogin.title')} subtitle={t('managerLogin.subtitle')}>
                     <form onSubmit={handleLogin} className="space-y-5">
                         {error && (
                             <div className="p-4 bg-red-50 text-red-600 text-sm font-medium rounded-xl border border-red-100 flex items-start gap-3">
@@ -85,7 +103,7 @@ const ManagerLogin: React.FC = () => {
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-[#193b5c] text-sm font-bold ml-1">E-mail Corporativo</label>
+                            <label className="text-[#193b5c] text-sm font-bold ml-1">{t('managerLogin.emailLabel')}</label>
                             <div className="relative group">
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors material-symbols-outlined">mail</span>
                                 <input
@@ -101,8 +119,8 @@ const ManagerLogin: React.FC = () => {
 
                         <div className="space-y-2">
                             <div className="flex justify-between items-center px-1">
-                                <label className="text-[#193b5c] text-sm font-bold">Senha</label>
-                                <button type="button" className="text-xs font-semibold text-primary hover:text-primary-dark transition-colors">Esqueceu?</button>
+                                <label className="text-[#193b5c] text-sm font-bold">{t('managerLogin.passwordLabel')}</label>
+                                <button type="button" className="text-xs font-semibold text-primary hover:text-primary-dark transition-colors">{t('managerLogin.forgotPassword')}</button>
                             </div>
                             <div className="relative group">
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors material-symbols-outlined">lock</span>
@@ -129,7 +147,7 @@ const ManagerLogin: React.FC = () => {
                         <div className="p-4 bg-primary/5 rounded-xl border border-primary/10 flex items-start gap-3">
                             <span className="material-symbols-outlined text-primary text-[20px] mt-0.5">verified_user</span>
                             <p className="text-xs text-primary/80 leading-relaxed font-medium">
-                                Este portal requer <span className="font-bold">Autenticação de Dois Fatores (2FA)</span> ativa para acesso administrativo.
+                                <Trans i18nKey="managerLogin.2faWarning" components={{ bold: <span className="font-bold" /> }} />
                             </p>
                         </div>
 
@@ -142,7 +160,7 @@ const ManagerLogin: React.FC = () => {
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                             ) : (
                                 <>
-                                    <span className="text-white text-base font-bold">Entrar no Sistema</span>
+                                    <span className="text-white text-base font-bold">{t('managerLogin.submitButton')}</span>
                                     <span className="material-symbols-outlined text-white text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
                                 </>
                             )}
@@ -151,7 +169,7 @@ const ManagerLogin: React.FC = () => {
                 </AuthCard>
 
                 <p className="mt-8 text-center text-xs text-gray-400 font-medium">
-                    &copy; 2026 Yuukyu Management Systems.<br />Uso restrito a funcionários autorizados.
+                    {t('managerLogin.copyright')}<br />{t('managerLogin.restrictedAccess')}
                 </p>
             </div>
         </div>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const Login: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
@@ -66,6 +66,24 @@ const Login: React.FC = () => {
         <div className="flex flex-col h-screen bg-background-light relative overflow-hidden">
             {/* Decorative subtle background gradient */}
             <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
+
+            {/* Language Selector */}
+            <div className="absolute top-6 right-6 z-20">
+                <div className="relative group">
+                    <select
+                        value={i18n.language.split('-')[0]}
+                        onChange={(e) => i18n.changeLanguage(e.target.value)}
+                        className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer hover:bg-white transition-all shadow-sm"
+                    >
+                        <option value="en">🇺🇸 English</option>
+                        <option value="pt">🇧🇷 Português</option>
+                        <option value="ja">🇯🇵 日本語</option>
+                    </select>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                    </div>
+                </div>
+            </div>
 
             <div className="flex flex-col items-center justify-center flex-1 px-8 py-8 w-full z-10">
                 {/* Logo */}

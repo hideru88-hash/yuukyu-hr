@@ -15,6 +15,20 @@
         "checkEmail": "Por favor, verifique seu e-mail para o link de confirmação!",
         "emailExists": "Este e-mail já está cadastrado. Por favor, tente entrar com sua senha."
     },
+    "managerLogin": {
+        "portalLabel": "Portal do Gestor",
+        "title": "Acesso Administrativo",
+        "subtitle": "Entre com suas credenciais corporativas para acessar o painel de gestão.",
+        "emailLabel": "E-mail Corporativo",
+        "passwordLabel": "Senha",
+        "forgotPassword": "Esqueceu?",
+        "2faWarning": "Este portal requer <bold>Autenticação de Dois Fatores (2FA)</bold> ativa para acesso administrativo.",
+        "submitButton": "Entrar no Sistema",
+        "copyright": "© 2026 Yuukyu Management Systems.",
+        "restrictedAccess": "Uso restrito a funcionários autorizados.",
+        "unauthorizedError": "Acesso não autorizado. Este portal é apenas para gestores.",
+        "loginFailed": "Falha ao entrar no sistema"
+    },
     "hr": {
         "panel": "Painel do RH",
         "searchPlaceholder": "Buscar funcionários, solicitações ou relatórios...",

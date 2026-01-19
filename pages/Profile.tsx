@@ -312,6 +312,16 @@ const Profile: React.FC = () => {
                         >
                             Português
                         </button>
+                        <button
+                            onClick={async () => {
+                                i18n.changeLanguage('ja');
+                                await supabase.from('user_profiles').update({ language: 'ja' }).eq('id', user?.id);
+                                await refreshProfile();
+                            }}
+                            className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${i18n.language.startsWith('ja') ? 'bg-primary text-white shadow-md' : 'bg-transparent text-gray-500 hover:bg-gray-50'}`}
+                        >
+                            日本語
+                        </button>
                     </div>
                 </section>
 
