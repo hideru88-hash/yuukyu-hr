@@ -217,3 +217,138 @@ export async function getUpcomingAbsences(limit: number = 5): Promise<any[]> {
     if (error) throw error;
     return data || [];
 }
+
+// ------------------------------------------------------------------
+// YUKYU (Paid Leave) RULE IMPLEMENTATION
+// Moved here to avoid dynamic import issues
+// ------------------------------------------------------------------
+
+interface YukyuGrant {
+    id: string;
+    grant_id?: string; // View alias
+    user_id: string;
+    grant_date: string;
+    expires_on: string;
+    remaining_days: number;
+    remaining_hours: number;
+}
+
+interface YukyuUsage {
+    leave_request_id: string;
+    grant_id: string;
+    used_days: number;
+    used_hours: number;
+}
+
+/**
+ * Approve a leave request using strict FIFO consumption logic for Yukyu.
+ */
+export async function approveLeaveWithYukyuRule(leaveRequestId: string, approverId: string): Promise<void> {
+    console.log(`[YukyuRule] Starting approval for request: ${leaveRequestId} by approver: ${approverId}`);
+
+    // 1. Fetch Request
+    const { data: request, error: reqError } = await supabase
+        .from('leave_requests')
+        .select('id, user_id, status, days, hours, type')
+        .eq('id', leaveRequestId)
+        .single();
+
+    if (reqError || !request) {
+        throw new Error(`Request not found or error fetching: ${reqError?.message}`);
+    }
+
+    if (request.status !== 'pending') {
+        throw new Error(`Request is not pending (current status: ${request.status})`);
+    }
+
+    const requestedDays = request.days || 0;
+    const requestedHours = request.hours || 0;
+
+    if (requestedDays <= 0 && requestedHours <= 0) {
+        throw new Error("Request has no duration (0 days, 0 hours).");
+    }
+
+    // 2. Fetch Grants (FIFO)
+    const today = new Date().toISOString().split('T')[0];
+    const { data: grants, error: grantError } = await supabase
+        .from('yukyu_balance_by_grant')
+        .select('*')
+        .eq('user_id', request.user_id)
+        .gte('expires_on', today)
+        .order('expires_on', { ascending: true })
+        .order('grant_date', { ascending: true });
+
+    if (grantError) throw new Error(`Error fetching grants: ${grantError.message}`);
+
+    const availableGrants = (grants || []) as YukyuGrant[];
+
+    // 3. Validate Balance
+    const totalDays = availableGrants.reduce((sum, g) => sum + Number(g.remaining_days), 0);
+    const totalHours = availableGrants.reduce((sum, g) => sum + Number(g.remaining_hours), 0);
+
+    if (totalDays < requestedDays) {
+        throw new Error(`Insufficient day balance. Requested: ${requestedDays}, Available: ${totalDays}`);
+    }
+    if (totalHours < requestedHours) {
+        throw new Error(`Insufficient hour balance. Requested: ${requestedHours}, Available: ${totalHours}`);
+    }
+
+    // 4. Calculate Usage (FIFO)
+    let leftToConsumeDays = requestedDays;
+    let leftToConsumeHours = requestedHours;
+    const usageOps: YukyuUsage[] = [];
+
+    for (const grant of availableGrants) {
+        if (leftToConsumeDays <= 0 && leftToConsumeHours <= 0) break;
+
+        const takeDays = Math.min(leftToConsumeDays, Number(grant.remaining_days));
+        const takeHours = Math.min(leftToConsumeHours, Number(grant.remaining_hours));
+
+        if (takeDays > 0 || takeHours > 0) {
+            usageOps.push({
+                leave_request_id: leaveRequestId,
+                grant_id: grant.grant_id || grant.id, // View might return 'grant_id' or 'id'
+                used_days: takeDays,
+                used_hours: takeHours
+            });
+
+            leftToConsumeDays -= takeDays;
+            leftToConsumeHours -= takeHours;
+        }
+    }
+
+    if (leftToConsumeDays > 0.01 || leftToConsumeHours > 0.01) {
+        throw new Error("Unable to fully cover the request with available grants (fragmentation issue?).");
+    }
+
+    console.log('[YukyuRule] Calculated usage:', usageOps);
+
+    // 5. Insert Usage Records
+    for (const op of usageOps) {
+        const { error: insertError } = await supabase
+            .from('yukyu_usage')
+            .insert({
+                leave_request_id: op.leave_request_id,
+                grant_id: op.grant_id,
+                used_days: op.used_days,
+                used_hours: op.used_hours
+            });
+
+        if (insertError) {
+            console.error('[YukyuRule] Error inserting usage:', insertError);
+            throw new Error(`Failed to record usage: ${insertError.message}`);
+        }
+    }
+
+    // 6. Update Request Status
+    const { error: updateError } = await supabase
+        .from('leave_requests')
+        .update({ status: 'approved' })
+        .eq('id', leaveRequestId);
+
+    if (updateError) {
+        throw new Error(`Failed to update request status: ${updateError.message}`);
+    }
+
+    console.log('[YukyuRule] Approval successful.');
+}

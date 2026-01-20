@@ -176,7 +176,10 @@
         "justNow": "たった今",
         "minutesAgo": "{{count}}分前",
         "hoursAgo": "{{count}}時間前",
-        "daysAgo": "{{count}}日前"
+        "daysAgo": "{{count}}日前",
+        "by": "申請者:",
+        "you": "あなた",
+        "total": "合計"
     },
     "nav": {
         "home": "ホーム",

@@ -176,7 +176,10 @@
         "justNow": "Just now",
         "minutesAgo": "{{count}} minutes ago",
         "hoursAgo": "{{count}} hours ago",
-        "daysAgo": "{{count}} days ago"
+        "daysAgo": "{{count}} days ago",
+        "by": "by",
+        "you": "You",
+        "total": "Total"
     },
     "nav": {
         "home": "Home",

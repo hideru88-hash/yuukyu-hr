@@ -10,7 +10,8 @@ import {
     rejectLeaveRequest,
     getUpcomingAbsences,
     PendingRequest,
-    HrMetrics
+    HrMetrics,
+    approveLeaveWithYukyuRule
 } from '../src/services/hrService';
 
 const HRDashboard: React.FC = () => {
@@ -56,7 +57,7 @@ const HRDashboard: React.FC = () => {
         try {
             if (action === 'approved') {
                 // Use the new FIFO Yukyu Rule
-                const { approveLeaveWithYukyuRule } = await import('../src/services/yukyuRule');
+                // Use the new FIFO Yukyu Rule
                 await approveLeaveWithYukyuRule(id, user.id);
             } else {
                 const reason = window.prompt(t('hr.rejectReasonPrompt') || 'Reason for rejection (optional):');

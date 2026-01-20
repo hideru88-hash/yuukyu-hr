@@ -177,7 +177,10 @@
         "justNow": "Agora mesmo",
         "minutesAgo": "Há {{count}} minutos",
         "hoursAgo": "Há {{count}} horas",
-        "daysAgo": "Há {{count}} dias"
+        "daysAgo": "Há {{count}} dias",
+        "by": "por",
+        "you": "Você",
+        "total": "Total"
     },
     "nav": {
         "home": "Início",
