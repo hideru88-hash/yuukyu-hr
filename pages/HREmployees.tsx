@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,6 +18,7 @@ interface Employee {
 
 const HREmployees: React.FC = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -249,8 +251,26 @@ const HREmployees: React.FC = () => {
                                 </span>
                             </div>
 
-                            <div className="ml-4 p-2 text-slate-300 group-hover:text-primary transition-colors">
-                                <span className="material-symbols-outlined">edit</span>
+                            <div className="ml-4 flex items-center gap-1">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/reports/ledger/${emp.id}`);
+                                    }}
+                                    className="p-2 text-slate-300 hover:text-blue-600 transition-colors"
+                                    title={t('ledger.title', 'View Ledger')}
+                                >
+                                    <span className="material-symbols-outlined">receipt_long</span>
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditClick(emp);
+                                    }}
+                                    className="p-2 text-slate-300 group-hover:text-primary transition-colors"
+                                >
+                                    <span className="material-symbols-outlined">edit</span>
+                                </button>
                             </div>
                         </div>
                     ))

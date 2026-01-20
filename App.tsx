@@ -11,6 +11,7 @@ import HRDashboard from './pages/HRDashboard';
 import HREmployees from './pages/HREmployees';
 import HRSettings from './pages/HRSettings';
 import Reports from './pages/Reports';
+import LeaveLedger from './pages/LeaveLedger';
 import Profile from './pages/Profile';
 import RequestDetails from './pages/RequestDetails';
 import ManagerLogin from './pages/ManagerLogin';
@@ -111,6 +112,7 @@ const AppRoutes: React.FC = () => {
                   <Route path="request-details/:id" element={<RequestDetails />} />
                   <Route path="calendar" element={<Calendar />} />
                   <Route path="reports" element={<Reports />} />
+                  <Route path="reports/ledger/:userId" element={<LeaveLedger />} />
                   <Route path="profile" element={<Profile />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>

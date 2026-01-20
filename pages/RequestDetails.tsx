@@ -93,9 +93,15 @@ const RequestDetails: React.FC = () => {
             <main className="flex-1 p-6 space-y-6 max-w-md mx-auto w-full">
                 {/* Status Hero */}
                 <div className="flex flex-col items-center justify-center py-8">
-                    <div className={`h-24 w-24 rounded-full flex items-center justify-center mb-4 shadow-sm ${getStatusColor(request.status).replace('text-', 'bg-').replace('100', '100')}`}>
-                        <span className={`material-symbols-outlined text-5xl ${getStatusColor(request.status).split(' ')[1]}`}>
-                            {getStatusIcon(request.status)}
+                    <div className={`h-24 w-24 rounded-full flex items-center justify-center mb-4 shadow-sm ${request.status === 'approved' ? 'bg-[#198754]' :
+                            request.status === 'rejected' ? 'bg-red-500' :
+                                'bg-yellow-100'
+                        }`}>
+                        <span className={`material-symbols-outlined text-5xl ${request.status === 'approved' || request.status === 'rejected' ? 'text-white' : 'text-yellow-700'
+                            }`}>
+                            {request.status === 'approved' ? 'check' :
+                                request.status === 'rejected' ? 'close' :
+                                    'pending'}
                         </span>
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 capitalize">
@@ -185,7 +191,11 @@ const RequestDetails: React.FC = () => {
                         {/* Status Change */}
                         {request.status !== 'pending' && (
                             <div className="relative">
-                                <div className={`absolute -left-[21px] ${request.status === 'approved' ? 'bg-green-500 ring-green-100' : 'bg-red-500 ring-red-100'} h-3 w-3 rounded-full border-2 border-white ring-2`}></div>
+                                <div className={`absolute -left-[27px] flex items-center justify-center h-6 w-6 rounded-full border-2 border-white ring-2 ${request.status === 'approved' ? 'bg-green-500 ring-green-100' : 'bg-red-500 ring-red-100'}`}>
+                                    <span className="material-symbols-outlined text-white text-[14px] font-bold">
+                                        {request.status === 'approved' ? 'check' : 'close'}
+                                    </span>
+                                </div>
                                 <p className="font-bold text-gray-900 text-sm">
                                     {request.status === 'approved' ? t('requestDetails.approvedByManager', 'Approved by Manager') : t('requestDetails.rejectedByManager', 'Rejected by Manager')}
                                 </p>

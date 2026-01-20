@@ -4,6 +4,16 @@ import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
+interface Grant {
+    id: string;
+    days_granted: number;
+    grant_date: string;
+    expires_on: string;
+    valid_from: string;
+    valid_until: string;
+    is_active: boolean;
+}
+
 const RequestLeave: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -23,6 +33,8 @@ const RequestLeave: React.FC = () => {
     const [balance, setBalance] = useState<number>(0);
     const [pendingDays, setPendingDays] = useState<number>(0);
     const [isBalanceLoading, setIsBalanceLoading] = useState(true);
+    const [expiringDays, setExpiringDays] = useState<number>(0);
+    const [expiryDate, setExpiryDate] = useState<string | null>(null);
 
     useEffect(() => {
         if (id && user) {
@@ -36,31 +48,80 @@ const RequestLeave: React.FC = () => {
     const fetchBalance = async () => {
         try {
             setIsBalanceLoading(true);
-            // 1. Get total authorized balance (Grants - Apporoved Usage)
-            const { data: balanceData } = await supabase
-                .from('yukyu_balance_total')
-                .select('total_days')
+
+            // 1. Fetch ALL Grants (Active)
+            const { data: grantsData, error: grantsError } = await supabase
+                .from('yukyu_grants')
+                .select('*')
                 .eq('user_id', user!.id)
-                .single();
+                .order('grant_date', { ascending: true });
 
-            const total = Number(balanceData?.total_days ?? 0);
-            setBalance(total);
+            if (grantsError) throw grantsError;
+            const grantsList: Grant[] = grantsData || [];
 
-            // 2. Get pending usage (Pending Requests that haven't deducted from balance yet)
-            // Note: If we are editing an existing pending request, we shouldn't count it double against itself
-            let query = supabase
+            // 2. Fetch ALL Requests (Approved & Pending) to calculate usage
+            const { data: requestsData, error: requestsError } = await supabase
                 .from('leave_requests')
-                .select('days')
+                .select('*')
                 .eq('user_id', user!.id)
-                .eq('status', 'pending');
+                .neq('status', 'rejected') // approved & pending count against potential usage
+                .order('start_date', { ascending: true });
 
-            if (id) {
-                query = query.neq('id', id);
+            if (requestsError) throw requestsError;
+            const allRequests = requestsData || [];
+
+            // --- FIFO CALCULATION ---
+            let tempGrants = grantsList.map(g => ({ ...g, remaining: Number(g.days_granted) }));
+            let totalUsed = 0;
+            let pendingUsed = 0;
+
+            for (const req of allRequests) {
+                // Skip current request if editing
+                if (id && req.id === id) continue;
+
+                let daysNeeded = Number(req.days);
+
+                // Track pending vs approved usage
+                if (req.status === 'pending') {
+                    pendingUsed += daysNeeded;
+                } else {
+                    totalUsed += daysNeeded; // Approved usage
+                }
+
+                // Deduct from grants (FIFO) - Logic tracks "consumed" grants
+                // We deduct BOTH pending and approved from the "Projected" remaining balance for display?
+                // Usually "Available Balance" = (Total Granted) - (Approved Used). Pending is shown separately.
+                // BUT, to show ACCURATE expiry, we need to know what's *truly* remaining.
+                // Let's stick to: Balance = Approved Remaining. Pending is just a warning.
+
+                if (req.status === 'approved') {
+                    for (let i = 0; i < tempGrants.length; i++) {
+                        if (daysNeeded <= 0) break;
+                        const grant = tempGrants[i];
+                        if (grant.remaining > 0) {
+                            const deduct = Math.min(grant.remaining, daysNeeded);
+                            grant.remaining -= deduct;
+                            daysNeeded -= deduct;
+                        }
+                    }
+                }
             }
 
-            const { data: pendingData } = await query;
-            const pending = pendingData?.reduce((acc, curr) => acc + Number(curr.days), 0) ?? 0;
-            setPendingDays(pending);
+            // Calculate Total Available Balance (from Grants - Approved Requests)
+            const totalAvailable = tempGrants.reduce((acc, g) => acc + g.remaining, 0);
+            setBalance(totalAvailable);
+            setPendingDays(pendingUsed);
+
+            // Calculate Next Expiry (Oldest grant with > 0 remaining)
+            let nextExpiryDays = 0;
+            let nextExpiryDate = null;
+            const oldestActive = tempGrants.find(g => g.remaining > 0);
+            if (oldestActive) {
+                nextExpiryDays = oldestActive.remaining;
+                nextExpiryDate = oldestActive.expires_on;
+            }
+            setExpiringDays(nextExpiryDays);
+            setExpiryDate(nextExpiryDate);
 
         } catch (error) {
             console.error('Error fetching balance:', error);
@@ -279,12 +340,12 @@ const RequestLeave: React.FC = () => {
                     <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl transition-all duration-700 group-hover:bg-white/20"></div>
                     <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-black/10 blur-xl"></div>
                     <div className="relative z-10 p-6 flex flex-col items-center justify-center gap-1">
-                        <span className="text-white/80 text-sm font-medium tracking-wide uppercase">{t('request.availableBalance')}</span>
+                        <span className="text-white/80 text-sm font-medium tracking-wide uppercase">{t('ledger.availableBalance', 'Available Balance')}</span>
                         <div className="flex items-baseline gap-1">
                             {isBalanceLoading ? (
                                 <span className="text-2xl font-bold opacity-50">...</span>
                             ) : (
-                                <span className="text-5xl font-extrabold tracking-tight">{balance}</span>
+                                <span className="text-5xl font-extrabold tracking-tight">{balance.toFixed(1)}</span>
                             )}
                             <span className="text-xl font-medium text-white/90">{t('common.days')}</span>
                         </div>
@@ -293,10 +354,15 @@ const RequestLeave: React.FC = () => {
                                 -{pendingDays} {t('status.pending')}
                             </div>
                         )}
-                        <div className="mt-4 flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
-                            <span className="material-symbols-outlined text-[14px]">history</span>
-                            {t('request.validUntil', { date: 'Dec 2024' })}
-                        </div>
+
+                        {expiryDate && expiringDays > 0 && (
+                            <div className="mt-4 flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
+                                <span className="font-bold">{expiringDays.toFixed(1)} {t('common.days').toLowerCase()}</span>
+                                <span className="opacity-90">
+                                    {t('ledger.validUntil', 'valid until')} {new Date(expiryDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 

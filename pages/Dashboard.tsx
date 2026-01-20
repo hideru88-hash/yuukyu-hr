@@ -342,22 +342,7 @@ const Dashboard: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Rejection Note */}
-                {req.status === 'rejected' && req.note && (
-                  <div className="px-4 pb-4 pt-0">
-                    <div className="bg-red-50/50 rounded-xl p-3 border border-red-100/50 flex gap-3">
-                      <span className="material-symbols-outlined text-red-400 text-[18px]">info</span>
-                      <div className="flex flex-col gap-0.5">
-                        <p className="text-[10px] uppercase font-bold text-red-600 tracking-wider">
-                          {t('request.rejectionReason')}
-                        </p>
-                        <p className="text-sm text-red-800 font-medium">
-                          {req.note}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+
               </div>
             ))
           )}

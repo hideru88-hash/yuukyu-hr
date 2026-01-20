@@ -179,7 +179,9 @@
         "daysAgo": "{{count}}日前",
         "by": "申請者:",
         "you": "あなた",
-        "total": "合計"
+        "total": "合計",
+        "yearsShort": "年",
+        "monthsShort": "ヶ月"
     },
     "nav": {
         "home": "ホーム",
@@ -207,5 +209,30 @@
             "title": "休暇申請却下",
             "body": "休暇申請が却下されました。"
         }
+    },
+    "ledger": {
+        "title": "休暇台帳",
+        "employee": "従業員",
+        "code": "コード",
+        "department": "部署",
+        "hireDate": "入社日",
+        "serviceLength": "勤続年数",
+        "currentBalance": "現在の残高",
+        "carriedOver": "繰越分",
+        "newGrant": "新規付与",
+        "total": "合計",
+        "leaveHistory": "休暇履歴",
+        "filter": "フィルター",
+        "colType": "タイプ",
+        "colPeriod": "期間",
+        "colUsed": "使用日数",
+        "colRemain": "残数",
+        "noHistory": "この期間の履歴はありません。",
+        "thisYearUsed": "今年の消化日数:",
+        "finalBalance": "最終残高:",
+        "availableBalance": "利用可能残高",
+        "validUntil": "有効期限",
+        "efficiencyInsight": "消化率インサイト",
+        "utilizationDesc": "の付与休暇を消化しました"
     }
 }

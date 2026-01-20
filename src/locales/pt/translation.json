@@ -180,7 +180,9 @@
         "daysAgo": "Há {{count}} dias",
         "by": "por",
         "you": "Você",
-        "total": "Total"
+        "total": "Total",
+        "yearsShort": "a",
+        "monthsShort": "m"
     },
     "nav": {
         "home": "Início",
@@ -208,5 +210,30 @@
             "title": "Solicitação Rejeitada",
             "body": "Sua solicitação foi rejeitada."
         }
+    },
+    "ledger": {
+        "title": "Extrato de Férias",
+        "employee": "FUNCIONÁRIO",
+        "code": "CÓDIGO",
+        "department": "Departamento",
+        "hireDate": "Data de Adm.",
+        "serviceLength": "Tempo de Casa",
+        "currentBalance": "SALDO ATUAL",
+        "carriedOver": "Acumulado",
+        "newGrant": "Nova Concessão",
+        "total": "Total",
+        "leaveHistory": "HISTÓRICO DE AUSÊNCIAS",
+        "filter": "Filtrar",
+        "colType": "Tipo",
+        "colPeriod": "Período",
+        "colUsed": "Usado",
+        "colRemain": "Restante",
+        "noHistory": "Nenhum histórico encontrado para este período.",
+        "thisYearUsed": "Usado Neste Ano:",
+        "finalBalance": "Saldo Final:",
+        "availableBalance": "Saldo Disponível",
+        "validUntil": "válido até",
+        "efficiencyInsight": "Eficiência de Uso",
+        "utilizationDesc": "das férias concedidas foram utilizadas"
     }
 }

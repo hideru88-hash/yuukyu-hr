@@ -179,7 +179,9 @@
         "daysAgo": "{{count}} days ago",
         "by": "by",
         "you": "You",
-        "total": "Total"
+        "total": "Total",
+        "yearsShort": "y",
+        "monthsShort": "m"
     },
     "nav": {
         "home": "Home",
@@ -207,5 +209,30 @@
             "title": "Leave Request Rejected",
             "body": "Your leave request has been rejected."
         }
+    },
+    "ledger": {
+        "title": "Leave Ledger",
+        "employee": "EMPLOYEE",
+        "code": "CODE",
+        "department": "Department",
+        "hireDate": "Hire Date",
+        "serviceLength": "Service Length",
+        "currentBalance": "CURRENT BALANCE",
+        "carriedOver": "Carried Over",
+        "newGrant": "New Grant",
+        "total": "Total",
+        "leaveHistory": "LEAVE HISTORY",
+        "filter": "Filter",
+        "colType": "Type",
+        "colPeriod": "Period",
+        "colUsed": "Used",
+        "colRemain": "Remain",
+        "noHistory": "No leave history found for this period.",
+        "thisYearUsed": "This Year Used:",
+        "finalBalance": "Final Balance:",
+        "availableBalance": "Available Balance",
+        "validUntil": "valid until",
+        "efficiencyInsight": "Efficiency Insight",
+        "utilizationDesc": "of granted leave utilized"
     }
 }
