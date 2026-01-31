@@ -13,6 +13,8 @@ const HRWorkplaces: React.FC = () => {
     const [form, setForm] = useState<Omit<ClientCompany, 'id' | 'created_at'>>({
         name: '',
         code: '',
+        president: '',
+        president_title: '',
         postal_code: '',
         address: '',
         contact_person: '',
@@ -80,6 +82,8 @@ const HRWorkplaces: React.FC = () => {
             setForm({
                 name: client.name,
                 code: client.code || '',
+                president: client.president || '',
+                president_title: client.president_title || '',
                 postal_code: client.postal_code || '',
                 address: client.address || '',
                 contact_person: client.contact_person || '',
@@ -97,6 +101,8 @@ const HRWorkplaces: React.FC = () => {
             setForm({
                 name: '',
                 code: '',
+                president: '',
+                president_title: '',
                 postal_code: '',
                 address: '',
                 contact_person: '',
@@ -375,6 +381,30 @@ const HRWorkplaces: React.FC = () => {
                                     <option value="active">{t('employeeDetail.workplace.active', '稼働中')}</option>
                                     <option value="suspended">{t('employeeDetail.workplace.suspended', '停止中')}</option>
                                 </select>
+                            </div>
+
+                            {/* President */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-600 dark:text-slate-400 ml-1">{t('employeeDetail.workplace.president', '代表者')}</label>
+                                <input
+                                    type="text"
+                                    value={form.president}
+                                    onChange={(e) => setForm({ ...form, president: e.target.value })}
+                                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white"
+                                    placeholder={t('employeeDetail.workplace.placeholders.president', '例: 鈴木一郎')}
+                                />
+                            </div>
+
+                            {/* President Title */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-600 dark:text-slate-400 ml-1">{t('employeeDetail.workplace.presidentTitle', '代表者役職')}</label>
+                                <input
+                                    type="text"
+                                    value={form.president_title}
+                                    onChange={(e) => setForm({ ...form, president_title: e.target.value })}
+                                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white"
+                                    placeholder={t('employeeDetail.workplace.placeholders.presidentTitle', '例: 代表取締役')}
+                                />
                             </div>
 
                             {/* Contact Person */}

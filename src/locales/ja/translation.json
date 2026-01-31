@@ -345,7 +345,8 @@
             "addressNotFound": "住所が見つかりませんでした。",
             "save": "企業を保存",
             "saving": "保存中...",
-            "cancel": "キャンセル"
+            "cancel": "キャンセル",
+            "addVisaType": "追加"
         },
         "workplace": {
             "title": "派遣先管理",
@@ -373,12 +374,16 @@
             "status": "ステータス",
             "active": "有効",
             "suspended": "停止中",
+            "president": "代表者",
+            "presidentTitle": "代表者役職",
             "hourly": "時給",
             "daily": "日給",
             "monthly": "月給",
             "placeholders": {
                 "name": "例: トヨタ伊賀",
                 "code": "例: T-IGA-01",
+                "president": "例: 鈴木一郎",
+                "presidentTitle": "例: 代表取締役",
                 "contact": "担当者の氏名",
                 "address": "所在地の詳細な住所",
                 "email": "contact@company.com",
@@ -445,5 +450,24 @@
             "noRates": "登録された単価がありません。",
             "deleteConfirm": "この単価を削除してもよろしいですか？"
         }
+    },
+    "settings": {
+        "title": "設定",
+        "subtitle": "会社の基本情報を設定します。",
+        "companyInfo": "派遣元会社情報",
+        "companyInfoSubtitle": "自社の基本情報を入力してください。",
+        "companyName": "派遣元会社名",
+        "president": "代表者",
+        "presidentTitle": "代表者役職",
+        "representative": "派遣元責任者",
+        "representativeTitle": "役職",
+        "postalCode": "郵便番号",
+        "address": "住所",
+        "phone": "電話番号",
+        "fax": "FAX番号",
+        "email": "メールアドレス",
+        "save": "保存",
+        "saved": "保存しました",
+        "addressNotFound": "住所が見つかりませんでした"
     }
 }

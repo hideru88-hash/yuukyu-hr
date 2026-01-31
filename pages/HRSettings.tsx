@@ -8,6 +8,8 @@ const HRSettings: React.FC = () => {
     // Company Settings State
     const [companySettings, setCompanySettings] = useState({
         company_name: '',
+        president: '',
+        president_title: '',
         postal_code: '',
         address: '',
         phone: '',
@@ -37,6 +39,8 @@ const HRSettings: React.FC = () => {
             if (data) {
                 setCompanySettings({
                     company_name: data.company_name || '',
+                    president: data.president || '',
+                    president_title: data.president_title || '',
                     postal_code: data.postal_code || '',
                     address: data.address || '',
                     phone: data.phone || '',
@@ -140,6 +144,30 @@ const HRSettings: React.FC = () => {
                             onChange={(e) => setCompanySettings({ ...companySettings, company_name: e.target.value })}
                             className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white"
                             placeholder="例: 株式会社東海理機"
+                        />
+                    </div>
+
+                    {/* President */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-slate-600 dark:text-slate-400 ml-1">{t('settings.president', '代表者')}</label>
+                        <input
+                            type="text"
+                            value={companySettings.president}
+                            onChange={(e) => setCompanySettings({ ...companySettings, president: e.target.value })}
+                            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white"
+                            placeholder="例: 山田一郎"
+                        />
+                    </div>
+
+                    {/* President Title */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-slate-600 dark:text-slate-400 ml-1">{t('settings.presidentTitle', '代表者役職')}</label>
+                        <input
+                            type="text"
+                            value={companySettings.president_title}
+                            onChange={(e) => setCompanySettings({ ...companySettings, president_title: e.target.value })}
+                            className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all dark:text-white"
+                            placeholder="例: 代表取締役"
                         />
                     </div>
 

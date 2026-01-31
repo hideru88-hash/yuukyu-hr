@@ -2,6 +2,8 @@ export interface ClientCompany {
   id: string;
   name: string;
   code?: string;
+  president?: string;
+  president_title?: string;
   postal_code?: string;
   address?: string;
   contact_person?: string;

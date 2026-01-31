@@ -145,7 +145,6 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({ children }) => {
                     <NavItem icon="dashboard" label={t('hr.overview')} path="/hr" />
                     <NavItem icon="groups" label={t('hr.team')} path="/hr/team" />
                     <NavItem icon="apartment" label={t('hr.workplaces')} path="/hr/workplaces" />
-                    <NavItem icon="verified_user" label={t('hr.visas')} path="/hr/visas" />
                     <NavItem icon="rule" label={t('hr.approvals')} path="/hr/approvals" badge={12} />
                     <NavItem icon="calendar_month" label={t('hr.calendar')} path="/hr/calendar" />
                     <NavItem icon="bar_chart" label={t('hr.reports')} path="/hr/reports" />

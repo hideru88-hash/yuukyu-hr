@@ -345,7 +345,8 @@
             "addressNotFound": "Postal code not found.",
             "save": "Save Workplace",
             "saving": "Saving...",
-            "cancel": "Cancel"
+            "cancel": "Cancel",
+            "addVisaType": "Add Type"
         },
         "workplace": {
             "title": "Client Companies / Workplaces",
@@ -373,12 +374,16 @@
             "status": "Company Status",
             "active": "Active",
             "suspended": "Suspended",
+            "president": "President / CEO",
+            "presidentTitle": "President Title",
             "hourly": "Hourly",
             "daily": "Daily",
             "monthly": "Monthly",
             "placeholders": {
                 "name": "e.g., Toyota",
                 "code": "e.g., TOY-001",
+                "president": "e.g., John Smith",
+                "presidentTitle": "e.g., CEO",
                 "contact": "Contact person name",
                 "address": "Full company address",
                 "email": "contact@company.com",
@@ -445,5 +450,24 @@
             "noRates": "No rates registered.",
             "deleteConfirm": "Are you sure you want to delete this rate?"
         }
+    },
+    "settings": {
+        "title": "Settings",
+        "subtitle": "Configure your company's basic information.",
+        "companyInfo": "Dispatch Company Information",
+        "companyInfoSubtitle": "Enter your company's basic information.",
+        "companyName": "Dispatch Company Name",
+        "president": "President / CEO",
+        "presidentTitle": "President Title",
+        "representative": "Dispatch Manager",
+        "representativeTitle": "Title",
+        "postalCode": "Postal Code",
+        "address": "Address",
+        "phone": "Phone",
+        "fax": "FAX",
+        "email": "Email",
+        "save": "Save",
+        "saved": "Saved successfully",
+        "addressNotFound": "Address not found"
     }
 }

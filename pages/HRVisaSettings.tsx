@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getVisaTypes, createVisaType, deleteVisaType } from '../src/services/hrService';
 
@@ -12,6 +13,9 @@ interface VisaType {
 
 const HRVisaSettings: React.FC = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const returnTo = searchParams.get('returnTo');
     const [visas, setVisas] = useState<VisaType[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,9 +80,24 @@ const HRVisaSettings: React.FC = () => {
     return (
         <div className="p-8 animate-in fade-in duration-500">
             <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('employeeDetail.visaSettings.title')}</h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-bold">{t('employeeDetail.visaSettings.subtitle')}</p>
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => {
+                            if (returnTo) {
+                                navigate(`/hr/team/${returnTo}?tab=documents`);
+                            } else {
+                                navigate(-1);
+                            }
+                        }}
+                        className="size-12 flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-sm text-slate-400 hover:text-primary hover:border-primary/30 transition-all"
+                        title={t('common.back', 'Voltar')}
+                    >
+                        <span className="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <div>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('employeeDetail.visaSettings.title')}</h1>
+                        <p className="text-slate-500 dark:text-slate-400 font-bold">{t('employeeDetail.visaSettings.subtitle')}</p>
+                    </div>
                 </div>
                 <button
                     onClick={handleOpenModal}

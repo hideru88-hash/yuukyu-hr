@@ -346,7 +346,8 @@
             "addressNotFound": "CEP não encontrado.",
             "save": "Salvar Empresa",
             "saving": "Salvando...",
-            "cancel": "Cancelar"
+            "cancel": "Cancelar",
+            "addVisaType": "Adicionar Tipo"
         },
         "workplace": {
             "title": "Empresas Clientes / Unidades",
@@ -374,12 +375,16 @@
             "status": "Status da Empresa",
             "active": "Ativa",
             "suspended": "Suspensa",
+            "president": "Presidente / Diretor",
+            "presidentTitle": "Cargo do Presidente",
             "hourly": "Hora",
             "daily": "Diária",
             "monthly": "Mensal",
             "placeholders": {
                 "name": "Ex: Mitsubishi Electric",
                 "code": "Ex: MIT-001",
+                "president": "Ex: Suzuki Ichiro",
+                "presidentTitle": "Ex: Diretor Presidente",
                 "contact": "Nome do responsável",
                 "address": "Endereço completo da empresa",
                 "email": "contato@empresa.com",
@@ -446,5 +451,24 @@
             "noRates": "Nenhuma taxa cadastrada.",
             "deleteConfirm": "Tem certeza que deseja excluir esta taxa?"
         }
+    },
+    "settings": {
+        "title": "Configurações",
+        "subtitle": "Configure as informações básicas da empresa.",
+        "companyInfo": "Informações da Empresa de Origem",
+        "companyInfoSubtitle": "Insira as informações básicas da sua empresa.",
+        "companyName": "Nome da Empresa de Origem",
+        "president": "Presidente / Diretor",
+        "presidentTitle": "Cargo do Presidente",
+        "representative": "Responsável pelo Despacho",
+        "representativeTitle": "Cargo",
+        "postalCode": "CEP",
+        "address": "Endereço",
+        "phone": "Telefone",
+        "fax": "FAX",
+        "email": "E-mail",
+        "save": "Salvar",
+        "saved": "Salvo com sucesso",
+        "addressNotFound": "Endereço não encontrado"
     }
 }

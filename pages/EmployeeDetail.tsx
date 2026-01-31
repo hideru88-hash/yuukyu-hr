@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getEmployeeDetail, updateEmployeeDetail, getVisaTypes } from '../src/services/hrService';
 import { clientService } from '../src/services/clientService';
@@ -11,6 +11,7 @@ type TabType = 'personal' | 'contract' | 'documents' | 'benefits' | 'history';
 const EmployeeDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { t, i18n } = useTranslation();
 
     const [employee, setEmployee] = useState<any>(null);
@@ -89,7 +90,12 @@ const EmployeeDetail: React.FC = () => {
         if (id) {
             fetchData();
         }
-    }, [id]);
+        // Check for tab parameter in URL
+        const tabParam = searchParams.get('tab');
+        if (tabParam && ['personal', 'contract', 'documents', 'benefits', 'history'].includes(tabParam)) {
+            setActiveTab(tabParam as TabType);
+        }
+    }, [id, searchParams]);
 
     const fetchData = async () => {
         try {
@@ -681,7 +687,17 @@ const EmployeeDetail: React.FC = () => {
 
                                         <div className="p-10 bg-blue-50/30 rounded-[32px] border border-blue-100/50 flex flex-col md:flex-row gap-8 items-end">
                                             <div className="flex-1 space-y-4">
-                                                <label className="text-[10px] font-black text-primary uppercase tracking-widest ml-1">{t('employeeDetail.fields.visaStatus')}</label>
+                                                <div className="flex items-center justify-between">
+                                                    <label className="text-[10px] font-black text-primary uppercase tracking-widest ml-1">{t('employeeDetail.fields.visaStatus')}</label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => navigate(`/hr/visas?returnTo=${id}`)}
+                                                        className="text-[9px] font-black text-primary uppercase tracking-wider hover:underline flex items-center gap-0.5"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[14px]">add</span>
+                                                        {t('employeeDetail.actions.addVisaType', 'Adicionar Tipo')}
+                                                    </button>
+                                                </div>
                                                 <select value={formData.visa_status} onChange={(e) => setFormData({ ...formData, visa_status: e.target.value })}
                                                     className="w-full px-6 py-4 bg-white border border-blue-100 rounded-[20px] font-bold text-slate-700 outline-none">
                                                     <option value="">{t('employeeDetail.status.selectVisa')}</option>
