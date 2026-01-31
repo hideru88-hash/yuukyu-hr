@@ -55,29 +55,11 @@ export async function fetchUserProfile(userId: string): Promise<UserProfile | nu
                 }
             }
 
-            // 3. Fallback: If profile doesn't exist, create it
+            // 3. Fallback: If profile doesn't exist, return a default object for the UI
+            // but DO NOT write to the database here (it overwrites roles)
             if (error && error.code === 'PGRST116') {
-                console.log('[useProfile] Profile not found, creating default...');
-                const { data: newProfile, error: createError } = await supabase
-                    .from('user_profiles')
-                    .upsert({
-                        id: userId,
-                        role: 'employee',
-                        full_name: null,
-                        avatar_url: null,
-                        department: null,
-                        manager_id: null,
-                        language: 'en',
-                        leave_balance: 20
-                    })
-                    .select('id, full_name, avatar_url, role, department, manager_id, language, leave_balance')
-                    .single();
-
-                if (createError) {
-                    console.error('[useProfile] Create profile error:', createError);
-                    return normalizeProfile({ id: userId, role: 'employee' });
-                }
-                return normalizeProfile(newProfile);
+                console.log('[useProfile] Profile not found in DB.');
+                return normalizeProfile({ id: userId, role: 'employee' });
             }
 
             if (error) {

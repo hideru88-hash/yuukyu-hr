@@ -45,16 +45,9 @@ const Dashboard: React.FC = () => {
           setProfile(profileData);
           currentProfile = profileData;
         } else {
-          // Create profile if not exists (simplistic approach for demo)
-          const { data: newProfile, error: createError } = await supabase
-            .from('user_profiles')
-            .upsert({ id: user.id, full_name: user.email?.split('@')[0], role: 'employee' })
-            .select()
-            .single();
-          if (!createError) {
-            setProfile(newProfile);
-            currentProfile = newProfile;
-          }
+          console.warn('[Dashboard] Profile not found or error. Using fallback.');
+          currentProfile = { id: user.id, full_name: user.email?.split('@')[0], role: 'employee' };
+          setProfile(currentProfile);
         }
 
         // Fetch requests

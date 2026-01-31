@@ -17,6 +17,9 @@ import RequestDetails from './pages/RequestDetails';
 import ManagerLogin from './pages/ManagerLogin';
 import Manager2FA from './pages/Manager2FA';
 import ManagerLayout from './src/components/ManagerLayout';
+import HRWorkplaces from './pages/HRWorkplaces';
+import HRVisaSettings from './pages/HRVisaSettings';
+import EmployeeDetail from './pages/EmployeeDetail';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -92,6 +95,9 @@ const AppRoutes: React.FC = () => {
               <Routes>
                 <Route index element={<HRDashboard />} />
                 <Route path="team" element={<HREmployees />} />
+                <Route path="team/:id" element={<EmployeeDetail />} />
+                <Route path="workplaces" element={<HRWorkplaces />} />
+                <Route path="visas" element={<HRVisaSettings />} />
                 <Route path="settings" element={<HRSettings />} />
                 <Route path="*" element={<Navigate to="/hr" replace />} />
               </Routes>
