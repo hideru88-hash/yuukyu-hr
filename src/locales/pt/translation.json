@@ -426,6 +426,25 @@
             "noCompany": "Sem Empresa",
             "balanceLabel": "Saldo Yuukyu",
             "allCompanies": "Todas Empresas"
+        },
+        "rates": {
+            "billingTitle": "Histórico de Taxa de Cobrança",
+            "billingSubtitle": "Valores cobrados da empresa cliente",
+            "salaryTitle": "Histórico de Salário",
+            "salarySubtitle": "Valores pagos ao funcionário",
+            "addRate": "Adicionar Taxa",
+            "editRate": "Editar Taxa",
+            "startDate": "Data Início",
+            "endDate": "Data Fim",
+            "rate": "Valor",
+            "rateType": "Tipo",
+            "hourly": "Hora",
+            "daily": "Diária",
+            "monthly": "Mensal",
+            "current": "Vigente",
+            "expired": "Expirado",
+            "noRates": "Nenhuma taxa cadastrada.",
+            "deleteConfirm": "Tem certeza que deseja excluir esta taxa?"
         }
     }
 }

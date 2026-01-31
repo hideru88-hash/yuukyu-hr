@@ -425,6 +425,25 @@
             "noCompany": "No Company",
             "balanceLabel": "Yūkyū Balance",
             "allCompanies": "All Companies"
+        },
+        "rates": {
+            "billingTitle": "Billing Rate History",
+            "billingSubtitle": "Rates charged to client company",
+            "salaryTitle": "Salary History",
+            "salarySubtitle": "Rates paid to employee",
+            "addRate": "Add Rate",
+            "editRate": "Edit Rate",
+            "startDate": "Start Date",
+            "endDate": "End Date",
+            "rate": "Rate",
+            "rateType": "Type",
+            "hourly": "Hourly",
+            "daily": "Daily",
+            "monthly": "Monthly",
+            "current": "Current",
+            "expired": "Expired",
+            "noRates": "No rates registered.",
+            "deleteConfirm": "Are you sure you want to delete this rate?"
         }
     }
 }

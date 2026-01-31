@@ -2,15 +2,37 @@ export interface ClientCompany {
   id: string;
   name: string;
   code?: string;
+  postal_code?: string;
   address?: string;
   contact_person?: string;
+  contact_title?: string;
   email?: string;
   phone?: string;
+  fax?: string;
   work_type?: string;
-  amount_per_employee?: number;
   billing_type?: 'hourly' | 'daily' | 'monthly';
   contract_url?: string;
   status?: 'active' | 'suspended';
+  created_at?: string;
+}
+
+export interface BillingRate {
+  id: string;
+  client_company_id: string;
+  start_date: string;
+  end_date?: string;
+  rate: number;
+  rate_type: 'hourly' | 'daily' | 'monthly';
+  created_at?: string;
+}
+
+export interface SalaryRate {
+  id: string;
+  user_id: string;
+  start_date: string;
+  end_date?: string;
+  rate: number;
+  rate_type: 'hourly' | 'daily' | 'monthly';
   created_at?: string;
 }
 

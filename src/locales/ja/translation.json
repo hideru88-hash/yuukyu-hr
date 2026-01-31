@@ -425,6 +425,25 @@
             "noCompany": "企業未設定",
             "balanceLabel": "有給残日数",
             "allCompanies": "すべての企業"
+        },
+        "rates": {
+            "billingTitle": "請求単価履歴",
+            "billingSubtitle": "企業からの請求単価",
+            "salaryTitle": "給与単価履歴",
+            "salarySubtitle": "従業員への支払い単価",
+            "addRate": "単価を追加",
+            "editRate": "単価を編集",
+            "startDate": "開始日",
+            "endDate": "終了日",
+            "rate": "単価",
+            "rateType": "種類",
+            "hourly": "時給",
+            "daily": "日給",
+            "monthly": "月給",
+            "current": "現在",
+            "expired": "期限切れ",
+            "noRates": "登録された単価がありません。",
+            "deleteConfirm": "この単価を削除してもよろしいですか？"
         }
     }
 }

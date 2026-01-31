@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getEmployeeDetail, updateEmployeeDetail, getVisaTypes } from '../src/services/hrService';
 import { clientService } from '../src/services/clientService';
-import { ClientCompany } from '../types';
+import { rateService } from '../src/services/rateService';
+import { ClientCompany, SalaryRate } from '../types';
 
 type TabType = 'personal' | 'contract' | 'documents' | 'benefits' | 'history';
 
@@ -21,6 +22,18 @@ const EmployeeDetail: React.FC = () => {
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [isBasicInfoModalOpen, setIsBasicInfoModalOpen] = useState(false);
     const [isSearchingPostal, setIsSearchingPostal] = useState(false);
+
+    // Salary Rate State
+    const [salaryRates, setSalaryRates] = useState<SalaryRate[]>([]);
+    const [isSalaryRateModalOpen, setIsSalaryRateModalOpen] = useState(false);
+    const [salaryRateForm, setSalaryRateForm] = useState<Omit<SalaryRate, 'id' | 'created_at' | 'user_id'>>({
+        start_date: '',
+        end_date: '',
+        rate: 0,
+        rate_type: 'hourly'
+    });
+    const [editingSalaryRate, setEditingSalaryRate] = useState<SalaryRate | null>(null);
+    const [salaryRateProcessing, setSalaryRateProcessing] = useState(false);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -185,6 +198,83 @@ const EmployeeDetail: React.FC = () => {
         }
     };
 
+    // Salary Rate Functions
+    const fetchSalaryRates = async () => {
+        if (!id) return;
+        try {
+            const data = await rateService.getSalaryRates(id);
+            setSalaryRates(data);
+        } catch (error) {
+            console.error('Error fetching salary rates:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (id) {
+            fetchSalaryRates();
+        }
+    }, [id]);
+
+    const handleOpenSalaryRateModal = (rate?: SalaryRate) => {
+        if (rate) {
+            setEditingSalaryRate(rate);
+            setSalaryRateForm({
+                start_date: rate.start_date,
+                end_date: rate.end_date || '',
+                rate: rate.rate,
+                rate_type: rate.rate_type
+            });
+        } else {
+            setEditingSalaryRate(null);
+            setSalaryRateForm({
+                start_date: '',
+                end_date: '',
+                rate: 0,
+                rate_type: 'hourly'
+            });
+        }
+        setIsSalaryRateModalOpen(true);
+    };
+
+    const handleSaveSalaryRate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!id) return;
+        setSalaryRateProcessing(true);
+        try {
+            if (editingSalaryRate) {
+                await rateService.updateSalaryRate(editingSalaryRate.id, salaryRateForm);
+            } else {
+                await rateService.createSalaryRate({
+                    ...salaryRateForm,
+                    user_id: id,
+                    end_date: salaryRateForm.end_date || undefined
+                });
+            }
+            setIsSalaryRateModalOpen(false);
+            fetchSalaryRates();
+        } catch (error: any) {
+            console.error('Error saving salary rate:', error);
+            alert('Error: ' + error.message);
+        } finally {
+            setSalaryRateProcessing(false);
+        }
+    };
+
+    const handleDeleteSalaryRate = async (rateId: string) => {
+        if (!confirm(t('employeeDetail.rates.deleteConfirm'))) return;
+        try {
+            await rateService.deleteSalaryRate(rateId);
+            fetchSalaryRates();
+        } catch (error: any) {
+            alert('Error: ' + error.message);
+        }
+    };
+
+    const isCurrentSalaryRate = (rate: SalaryRate) => {
+        const today = new Date().toISOString().split('T')[0];
+        return rate.start_date <= today && (!rate.end_date || rate.end_date >= today);
+    };
+
     if (loading) {
         return (
             <div className="p-8 flex items-center justify-center min-h-[400px]">
@@ -314,6 +404,61 @@ const EmployeeDetail: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Salary Rate History Section */}
+                        <div className="bg-white rounded-[32px] shadow-sm border border-slate-100 overflow-hidden p-6 space-y-4">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-sm font-black text-slate-900">{t('employeeDetail.rates.salaryTitle')}</h3>
+                                <button
+                                    onClick={() => handleOpenSalaryRateModal()}
+                                    className="text-primary text-[10px] font-black uppercase tracking-wider hover:underline flex items-center gap-1"
+                                >
+                                    <span className="material-symbols-outlined text-[14px]">add</span>
+                                    {t('employeeDetail.rates.addRate')}
+                                </button>
+                            </div>
+                            <p className="text-[10px] text-slate-400">{t('employeeDetail.rates.salarySubtitle')}</p>
+
+                            {salaryRates.length === 0 ? (
+                                <div className="text-center py-6 text-slate-400">
+                                    <span className="material-symbols-outlined text-3xl mb-1">payments</span>
+                                    <p className="text-xs">{t('employeeDetail.rates.noRates')}</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    {salaryRates.map((rate) => (
+                                        <div key={rate.id} className={`p-3 rounded-xl border ${isCurrentSalaryRate(rate) ? 'border-green-300 bg-green-50 dark:bg-green-900/20' : 'border-slate-100'}`}>
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-lg font-black text-slate-900">¥{rate.rate.toLocaleString()}</span>
+                                                        <span className="text-[9px] px-1.5 py-0.5 bg-slate-100 rounded-full text-slate-500">
+                                                            {t(`employeeDetail.rates.${rate.rate_type}`)}
+                                                        </span>
+                                                        {isCurrentSalaryRate(rate) && (
+                                                            <span className="text-[9px] px-1.5 py-0.5 bg-green-100 rounded-full text-green-700 font-bold">
+                                                                {t('employeeDetail.rates.current')}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-[10px] text-slate-400 mt-0.5">
+                                                        {rate.start_date} ~ {rate.end_date || '∞'}
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-0.5">
+                                                    <button onClick={() => handleOpenSalaryRateModal(rate)} className="p-1 text-slate-300 hover:text-primary">
+                                                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                                                    </button>
+                                                    <button onClick={() => handleDeleteSalaryRate(rate.id)} className="p-1 text-slate-300 hover:text-red-500">
+                                                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Quick Actions Sidebar */}
@@ -502,16 +647,6 @@ const EmployeeDetail: React.FC = () => {
                                                     className="size-6 text-primary rounded ring-offset-2" />
                                                 <span className="font-bold text-slate-700">{t('employeeDetail.fields.isTeamLead')}</span>
                                             </div>
-                                        </div>
-                                        <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('employeeDetail.fields.sourceCompany')}</label>
-                                            <input
-                                                type="text"
-                                                value={formData.source_company}
-                                                onChange={(e) => setFormData({ ...formData, source_company: e.target.value })}
-                                                placeholder={t('employeeDetail.placeholders.sourceCompany')}
-                                                className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-[20px] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-bold text-slate-700"
-                                            />
                                         </div>
                                     </div>
                                 </section>
@@ -852,6 +987,88 @@ const EmployeeDetail: React.FC = () => {
                                 {t('employeeDetail.actions.confirm')}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Salary Rate Modal */}
+            {isSalaryRateModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                {editingSalaryRate ? t('employeeDetail.rates.editRate') : t('employeeDetail.rates.addRate')}
+                            </h3>
+                            <button onClick={() => setIsSalaryRateModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <form onSubmit={handleSaveSalaryRate}>
+                            <div className="p-6 space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('employeeDetail.rates.startDate')}</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={salaryRateForm.start_date}
+                                            onChange={(e) => setSalaryRateForm({ ...salaryRateForm, start_date: e.target.value })}
+                                            className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 focus:border-primary outline-none transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('employeeDetail.rates.endDate')}</label>
+                                        <input
+                                            type="date"
+                                            value={salaryRateForm.end_date}
+                                            onChange={(e) => setSalaryRateForm({ ...salaryRateForm, end_date: e.target.value })}
+                                            className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 focus:border-primary outline-none transition-all"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('employeeDetail.rates.rate')} (¥)</label>
+                                        <input
+                                            type="number"
+                                            required
+                                            min="0"
+                                            value={salaryRateForm.rate}
+                                            onChange={(e) => setSalaryRateForm({ ...salaryRateForm, rate: Number(e.target.value) })}
+                                            className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 focus:border-primary outline-none transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('employeeDetail.rates.rateType')}</label>
+                                        <select
+                                            value={salaryRateForm.rate_type}
+                                            onChange={(e) => setSalaryRateForm({ ...salaryRateForm, rate_type: e.target.value as any })}
+                                            className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 focus:border-primary outline-none transition-all appearance-none"
+                                        >
+                                            <option value="hourly">{t('employeeDetail.rates.hourly')}</option>
+                                            <option value="daily">{t('employeeDetail.rates.daily')}</option>
+                                            <option value="monthly">{t('employeeDetail.rates.monthly')}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-6 bg-slate-50 dark:bg-slate-900/50 flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsSalaryRateModalOpen(false)}
+                                    className="px-4 py-2 text-slate-600 dark:text-slate-400 font-bold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                >
+                                    {t('employeeDetail.actions.cancel')}
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={salaryRateProcessing}
+                                    className="px-6 py-2 bg-primary text-white font-bold text-sm rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
+                                >
+                                    {salaryRateProcessing ? t('employeeDetail.actions.saving') : t('employeeDetail.actions.save')}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
